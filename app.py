@@ -23,7 +23,7 @@ if "code" in query_params:
 
     # Fetch top 5 artists
     artist_res = requests.get(f"{BACKEND_URL}/top-artists/{spotify_id}")
-    st.write(f"{artist_res} helllo")
+    st.write(f"{artist_res.json()} helllo")
     if artist_res.status_code == 200:
         artist_data = artist_res.json()
         st.subheader("🎧 Your Top 5 Artists")
