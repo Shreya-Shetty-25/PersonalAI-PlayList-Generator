@@ -2,8 +2,7 @@
 import streamlit as st
 import requests
 
-BACKEND_URL = "http://localhost:8000"
-
+BACKEND_URL = "https://personalai-playlist-generator.onrender.com"
 st.set_page_config(page_title="Spotify Login", page_icon="🎵")
 st.title("🎵 Spotify Login Demo")
 

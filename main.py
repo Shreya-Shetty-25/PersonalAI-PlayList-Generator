@@ -59,6 +59,7 @@ def login_spotify():
 @app.get("/callback")
 def spotify_callback(request: Request):
     code = request.query_params.get("code")
+    print("hi")
     if not code:
         return JSONResponse({"error": "No code in callback"})
 
