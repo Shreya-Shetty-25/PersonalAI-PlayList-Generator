@@ -136,26 +136,22 @@ def get_top_artists(spotify_user_id: str):
     if not session:
         return {"error": "User not found"}
 
-    # Refresh token if needed
+    # Refresh token if expired
     if int(time.time()) >= session["expires_at"]:
         new_token, expires_in = refresh_access_token(session["refresh_token"])
         if not new_token:
             return {"error": "Could not refresh token"}
-
         session["access_token"] = new_token
         session["expires_at"] = int(time.time()) + expires_in
 
-    headers = {
-        "Authorization": f"Bearer {session['access_token']}"
-    }
+    headers = {"Authorization": f"Bearer {session['access_token']}"}
+    url = "https://api.spotify.com/v1/me/top/artists?limit=5"
 
-    # Get top artists
-    response = requests.get(
-        "https://api.spotify.com/v1/me/top/artists?limit=5",
-        headers=headers
-    )
-
-    if response.status_code != 200:
+    try:
+        response = requests.get(url, headers=headers)
+        response.raise_for_status()
+        return response.json()
+    except requests.exceptions.RequestException as e:
+        print("❌ Spotify API error:", e)
+        print("❌ Response content:", response.text)
         return {"error": "Failed to fetch top artists"}
-
-    return response.json()
