@@ -15,6 +15,8 @@ if "code" in query_params:
 
     if response.status_code == 200:
         data = response.json()
+        st.success("hello")
+        st.success(data)
         st.success(f"{data['message']}")
     spotify_id = data['spotify_id']
     st.write(f"**Spotify ID:** `{spotify_id}`")
