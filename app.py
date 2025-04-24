@@ -15,10 +15,20 @@ if "code" in query_params:
 
     if response.status_code == 200:
         data = response.json()
-        st.success(f"Welcome, {data['message']}")
-        st.write(f"**Spotify ID:** `{data['spotify_id']}`")
+        st.success(f"{data['message']}")
+    spotify_id = data['spotify_id']
+    st.write(f"**Spotify ID:** `{spotify_id}`")
+
+    # Fetch top 5 artists
+    artist_res = requests.get(f"{BACKEND_URL}/top-artists/{spotify_id}")
+    if artist_res.status_code == 200:
+        artist_data = artist_res.json()
+        st.subheader("🎧 Your Top 5 Artists")
+        for idx, artist in enumerate(artist_data.get("items", []), start=1):
+            st.markdown(f"**{idx}. {artist['name']}**")
     else:
-        st.error("Spotify login failed. Try again.")
+        st.error("Couldn't fetch top artists.")
+
 
 # Initial login screen
 else:
