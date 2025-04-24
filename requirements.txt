@@ -4,3 +4,4 @@ uvicorn
 requests
 dotenv
 streamlit
+fastapi
