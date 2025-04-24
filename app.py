@@ -23,12 +23,26 @@ if "code" in query_params:
 
     # Fetch top 5 artists
     artist_res = requests.get(f"{BACKEND_URL}/top-artists/{spotify_id}")
-    st.write(f"{artist_res.json()} helllo")
     if artist_res.status_code == 200:
         artist_data = artist_res.json()
-        st.subheader("🎧 Your Top 5 Artists")
-        for idx, artist in enumerate(artist_data.get("items", []), start=1):
-            st.markdown(f"**{idx}. {artist['name']}**")
+        artists = artist_data.get("items", [])
+
+        if artists:
+            st.subheader("🎧 Your Top 5 Artists")
+
+            for artist in artists:
+                name = artist.get("name", "Unknown Artist")
+                images = artist.get("images", [])
+                image_url = images[0]["url"] if images else None
+
+                col1, col2 = st.columns([1, 4])
+                with col1:
+                    if image_url:
+                        st.image(image_url, width=80)
+                with col2:
+                    st.markdown(f"**{name}**")
+        else:
+            st.info("No top artists found.")
     else:
         st.error("Couldn't fetch top artists.")
 
