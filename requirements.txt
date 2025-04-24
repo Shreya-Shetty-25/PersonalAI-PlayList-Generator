@@ -1,2 +1,7 @@
 httpx
 bcrypt
+uvicorn
+requests
+dotenv
+streamlit
+fastapi
