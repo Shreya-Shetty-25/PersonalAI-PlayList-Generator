@@ -1,3 +1,6 @@
 httpx
 bcrypt
 uvicorn
+requests
+dotenv
+streamlit
