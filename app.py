@@ -7,7 +7,7 @@ st.set_page_config(page_title="Spotify Login", page_icon="🎵")
 st.title("🎵 Spotify Login Demo")
 
 query_params = st.query_params  # ✅ updated method
-query_params="AQA0711tyLdePApDEUi0hMFs3N4wPbpxVUdzkXpUmYjdQXjzO64TKUv-Fy12t_Udt4jQsdszczIfWj0KVQbkDsl4eWA-p64oIR0N7x_Ay-dMXQmA78b4CA10Q1md-7yBn5X2j7GRb-IMSwkbw8swVIcnfwDicgkvnmnUt9dI1P9cktwOEtzSfnw_WEG0NoUwNmWsTzyETScLorE1izXYKfJNiSVvA-sEZZCVs7ztuq_tQbk"
+query_params={"code":"AQA0711tyLdePApDEUi0hMFs3N4wPbpxVUdzkXpUmYjdQXjzO64TKUv-Fy12t_Udt4jQsdszczIfWj0KVQbkDsl4eWA-p64oIR0N7x_Ay-dMXQmA78b4CA10Q1md-7yBn5X2j7GRb-IMSwkbw8swVIcnfwDicgkvnmnUt9dI1P9cktwOEtzSfnw_WEG0NoUwNmWsTzyETScLorE1izXYKfJNiSVvA-sEZZCVs7ztuq_tQbk"}
 # Handle redirect from Spotify with code
 if "code" in query_params:
     code = query_params["code"]
