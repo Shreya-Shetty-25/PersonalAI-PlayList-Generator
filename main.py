@@ -87,7 +87,7 @@ def spotify_callback(request: Request):
 
     response = requests.post(token_url, data=payload)
     token_data = response.json()
-
+    print(token_data)
     access_token = token_data.get("access_token")
     refresh_token = token_data.get("refresh_token")
     expires_in = token_data.get("expires_in", 3600)
