@@ -22,8 +22,6 @@ app.add_middleware(
 SPOTIFY_CLIENT_ID = os.getenv("SPOTIFY_CLIENT_ID")
 SPOTIFY_CLIENT_SECRET = os.getenv("SPOTIFY_CLIENT_SECRET")
 SPOTIFY_REDIRECT_URI = os.getenv("SPOTIFY_REDIRECT_URI")
-print(SPOTIFY_CLIENT_ID)
-print(SPOTIFY_CLIENT_SECRET)
 
 # In-memory session store
 spotify_sessions = {}
@@ -39,11 +37,7 @@ def refresh_access_token(refresh_token: str):
 
     response = requests.post(token_url, data=payload)
     data = response.json()
-
-    new_token = data.get("access_token")
-    expires_in = data.get("expires_in", 3600)  # default 1hr
-
-    return new_token, expires_in
+    return data.get("access_token"), data.get("expires_in", 3600)
 
 @app.get("/login-spotify")
 def login_spotify():
@@ -51,13 +45,7 @@ def login_spotify():
         "user-read-private",
         "user-read-email",
         "user-top-read",
-        "user-library-read",
-        "user-read-recently-played",
-        "user-follow-read",
-        "playlist-read-private",
-        "playlist-read-collaborative",
-        "playlist-modify-public",
-        "playlist-modify-private"
+        "user-read-recently-played"
     ]
     scope_param = "%20".join(scopes)
     auth_url = (
@@ -72,7 +60,6 @@ def login_spotify():
 @app.get("/callback")
 def spotify_callback(request: Request):
     code = request.query_params.get("code")
-    print("hi")
     if not code:
         return JSONResponse({"error": "No code in callback"})
 
@@ -95,18 +82,16 @@ def spotify_callback(request: Request):
     if not access_token:
         return JSONResponse({"error": "Failed to get access token"})
 
-    # Get user info
     user_response = requests.get(
         "https://api.spotify.com/v1/me",
         headers={"Authorization": f"Bearer {access_token}"}
     )
     user_info = user_response.json()
-
     spotify_user_id = user_info.get("id")
+
     if not spotify_user_id:
         return JSONResponse({"error": "Failed to fetch user info"})
-    
-    # Save in memory
+
     spotify_sessions[spotify_user_id] = {
         "access_token": access_token,
         "refresh_token": refresh_token,
@@ -114,36 +99,12 @@ def spotify_callback(request: Request):
         "display_name": user_info.get("display_name")
     }
 
-    return JSONResponse({
-        "message": f"Welcome, {user_info.get('display_name')}!",
-        "spotify_id": spotify_user_id
-    })
+    # Redirect to Streamlit app
+    redirect_url = f"https://personalai-playlist-generator-spotify.streamlit.app/?spotify_id={spotify_user_id}"
+    return RedirectResponse(redirect_url)
 
-@app.get("/me/{spotify_user_id}")
-def get_me(spotify_user_id: str):
-    session = spotify_sessions.get(spotify_user_id)
-    if not session:
-        return {"error": "User not found"}
-
-    # Check if token expired
-    if int(time.time()) >= session["expires_at"]:
-        new_token, expires_in = refresh_access_token(session["refresh_token"])
-        if not new_token:
-            return {"error": "Could not refresh token"}
-
-        # Update session
-        session["access_token"] = new_token
-        session["expires_at"] = int(time.time()) + expires_in
-
-    # Now call Spotify API
-    user_response = requests.get(
-        "https://api.spotify.com/v1/me",
-        headers={"Authorization": f"Bearer {session['access_token']}"}
-    )
-    return user_response.json()
-
-@app.get("/top-artists/{spotify_user_id}")
-def get_top_artists(spotify_user_id: str):
+@app.get("/user-info/{spotify_user_id}")
+def get_user_info(spotify_user_id: str):
     session = spotify_sessions.get(spotify_user_id)
     if not session:
         return {"error": "User not found"}
@@ -157,13 +118,16 @@ def get_top_artists(spotify_user_id: str):
         session["expires_at"] = int(time.time()) + expires_in
 
     headers = {"Authorization": f"Bearer {session['access_token']}"}
-    url = "https://api.spotify.com/v1/me/top/artists?limit=5"
 
-    try:
-        response = requests.get(url, headers=headers)
-        response.raise_for_status()
-        return response.json()
-    except requests.exceptions.RequestException as e:
-        print("❌ Spotify API error:", e)
-        print("❌ Response content:", response.text)
-        return {"error": "Failed to fetch top artists"}
+    # Get top 5 tracks
+    tracks_res = requests.get(
+        "https://api.spotify.com/v1/me/top/tracks?limit=5",
+        headers=headers
+    )
+    if tracks_res.status_code != 200:
+        return {"error": "Failed to fetch top tracks"}
+
+    return {
+        "display_name": session["display_name"],
+        "top_tracks": tracks_res.json().get("items", [])
+    }

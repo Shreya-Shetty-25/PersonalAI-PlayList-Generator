@@ -3,52 +3,38 @@ import streamlit as st
 import requests
 
 BACKEND_URL = "https://personalai-playlist-generator.onrender.com"
-st.set_page_config(page_title="Spotify Login", page_icon="🎵")
+
+st.set_page_config(page_title="Spotify Demo", page_icon="🎵")
 st.title("🎵 Spotify Login Demo")
 
-query_params = st.query_params  
-if "code" in query_params:
-    code = query_params["code"]
-    response = requests.get(f"{BACKEND_URL}/callback?code={code}")
-    st.write(response.status_code)
-    if response.status_code == 200:
-        data = response.json()
-        st.success("hello")
-        st.success(data)
-        st.success(f"{data['message']}")
-        spotify_id = data['spotify_id']
-        st.write(f"**Spotify ID:** `{spotify_id}` ok!")
+query_params = st.query_params
+if "spotify_id" in query_params:
+    spotify_id = query_params["spotify_id"]
 
-        # Fetch top 5 artists
-        artist_res = requests.get(f"{BACKEND_URL}/top-artists/{spotify_id}")
-        if artist_res.status_code == 200:
-            artist_data = artist_res.json()
-            artists = artist_data.get("items", [])
+    st.success("✅ Logged in successfully!")
 
-            if artists:
-                st.subheader("🎧 Your Top 5 Artists")
+    # Fetch user info
+    res = requests.get(f"{BACKEND_URL}/user-info/{spotify_id}")
+    if res.status_code == 200:
+        data = res.json()
+        st.header(f"👋 Welcome, {data['display_name']}")
 
-                for artist in artists:
-                    name = artist.get("name", "Unknown Artist")
-                    images = artist.get("images", [])
-                    image_url = images[0]["url"] if images else None
+        st.subheader("🎧 Your Top 5 Tracks")
+        for track in data["top_tracks"]:
+            name = track.get("name")
+            artists = ", ".join([artist["name"] for artist in track["artists"]])
+            album_img = track["album"]["images"][0]["url"] if track["album"]["images"] else None
 
-                    col1, col2 = st.columns([1, 4])
-                    with col1:
-                        if image_url:
-                            st.image(image_url, width=80)
-                    with col2:
-                        st.markdown(f"**{name}**")
-            else:
-                st.info("No top artists found.")
-        else:
-            st.error("Couldn't fetch top artists.")
+            col1, col2 = st.columns([1, 4])
+            with col1:
+                if album_img:
+                    st.image(album_img, width=80)
+            with col2:
+                st.markdown(f"**{name}** by *{artists}*")
     else:
-        st.info("User not Found.")
+        st.error("Something went wrong fetching your data.")
 
-
-# Initial login screen
 else:
-    st.write("Click below to authenticate with your Spotify account:")
+    st.info("Please login with your Spotify account.")
     login_url = f"{BACKEND_URL}/login-spotify"
     st.markdown(f"[👉 Login with Spotify]({login_url})", unsafe_allow_html=True)
