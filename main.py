@@ -116,38 +116,6 @@ def spotify_callback(request: Request):
     return RedirectResponse(redirect_url)
 
 
-@app.get("/user-info/{spotify_user_id}")
-def get_user_info(spotify_user_id: str):
-    session = spotify_sessions.get(spotify_user_id)
-    if not session:
-        print(f"No session found for user: {spotify_user_id}")
-        return {"error": "User not found"}
-
-    # Refresh if expired
-    if int(time.time()) >= session["expires_at"]:
-        new_token, expires_in = refresh_access_token(session["refresh_token"])
-        if not new_token:
-            print(f" Failed to refresh token for {spotify_user_id}")
-            return {"error": "Could not refresh token"}
-
-        session["access_token"] = new_token
-        session["expires_at"] = int(time.time()) + expires_in
-
-    headers = {"Authorization": f"Bearer {session['access_token']}"}
-    tracks_res = requests.get(
-        "https://api.spotify.com/v1/me/top/tracks?limit=5",
-        headers=headers
-    )
-
-    if tracks_res.status_code != 200:
-        print(" Error fetching top tracks:", tracks_res.text)
-        return {"error": "Failed to fetch top tracks"}
-
-    return {
-        "display_name": session["display_name"],
-        "top_tracks": tracks_res.json().get("items", [])
-    }
-
 def save_user_data(spotify_user_id, display_name, top_tracks, top_artists, top_genres):
     conn = sqlite3.connect("spotify_sessions.db")
     cursor = conn.cursor()
