@@ -171,7 +171,7 @@ def get_user_info(spotify_user_id: str):
     
     # Join genres into a string
     top_genres_str = ",".join(top_genres)
-    print(top_tracks,"**",top_artists,"**",top_genres)
+    # print(top_tracks,"**",top_artists,"**",top_genres)
     # Save user data to SQLite
     save_user_data(spotify_user_id, session["display_name"], top_tracks, top_artists, top_genres_str)
 

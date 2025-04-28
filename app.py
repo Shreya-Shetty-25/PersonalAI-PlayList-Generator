@@ -12,6 +12,7 @@ query_params = st.query_params
 if "spotify_id" in query_params:
     spotify_id = query_params["spotify_id"]
     st.success("Logged in successfully!")
+    st.success(spotify_id)
     try:
         client = ollama.Client(host='http://10.0.4.191:11434')
         st.title("Chat with Ollama")
