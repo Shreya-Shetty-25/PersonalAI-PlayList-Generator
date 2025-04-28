@@ -63,37 +63,37 @@ if "spotify_id" in query_params:
             st.success(f"The user's overall mood during the chat was: **{user_mood.capitalize()}**")
 
             st.info("Chat has ended. Start a new conversation by refreshing the page.")
-            if st.session_state.chat_active:
-                if prompt := st.chat_input("Say something"):
-                    # Add user message to chat history
-                    st.session_state.messages.append({"role": "user", "content": prompt})
-                    with st.chat_message("user"):
-                        st.markdown(prompt)
+        if st.session_state.chat_active:
+            if prompt := st.chat_input("Say something"):
+                # Add user message to chat history
+                st.session_state.messages.append({"role": "user", "content": prompt})
+                with st.chat_message("user"):
+                    st.markdown(prompt)
 
-                    # Truncate history to the last 6 messages (3 user + 3 assistant)
-                    st.session_state.messages = st.session_state.messages[-6:]
+                # Truncate history to the last 6 messages (3 user + 3 assistant)
+                st.session_state.messages = st.session_state.messages[-6:]
 
-                    # Generate response using Ollama with persona-based prompting
-                    system_message = {"role": "system", "content": ASSISTANT_PERSONA}
-                    
-                    # Prepare messages for the chat, including the system message
-                    chat_messages = [system_message]
+                # Generate response using Ollama with persona-based prompting
+                system_message = {"role": "system", "content": ASSISTANT_PERSONA}
+                
+                # Prepare messages for the chat, including the system message
+                chat_messages = [system_message]
 
-                    # Add conversation history (limited to last 5 exchanges)
-                    for m in st.session_state.messages[-10:]:  # Last 5 exchanges (10 messages)
-                        chat_messages.append({"role": m["role"], "content": m["content"]})
+                # Add conversation history (limited to last 5 exchanges)
+                for m in st.session_state.messages[-10:]:  # Last 5 exchanges (10 messages)
+                    chat_messages.append({"role": m["role"], "content": m["content"]})
 
-                    # Add the current user message
-                    chat_messages.append({"role": "user", "content": prompt})
+                # Add the current user message
+                chat_messages.append({"role": "user", "content": prompt})
 
-                    # Get response from Ollama
-                    response = client.chat(model='llama3.2', messages=chat_messages)
-                    msg = response['message']['content']
+                # Get response from Ollama
+                response = client.chat(model='llama3.2', messages=chat_messages)
+                msg = response['message']['content']
 
-                    # Display and store assistant response
-                    with st.chat_message("assistant"):
-                        st.markdown(msg)
-                    st.session_state.messages.append({"role": "assistant", "content": msg})
+                # Display and store assistant response
+                with st.chat_message("assistant"):
+                    st.markdown(msg)
+                st.session_state.messages.append({"role": "assistant", "content": msg})
 
     else:
         st.error("Something went wrong fetching your data.")
