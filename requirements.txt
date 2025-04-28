@@ -5,3 +5,4 @@ requests
 dotenv
 streamlit
 fastapi
+ollama

@@ -1,6 +1,8 @@
 # app.py
 import streamlit as st
 import requests
+import streamlit as st
+import ollama
 
 BACKEND_URL = "https://personalai-playlist-generator.onrender.com"
 
@@ -16,42 +18,82 @@ if "spotify_id" in query_params:
     # Fetch user info
     res = requests.get(f"{BACKEND_URL}/user-info/{spotify_id}")
     if res.status_code == 200:
-        data = res.json()
-        st.header(f"Welcome, {data['display_name']}")
+        client = ollama.Client(host='http://10.0.4.191:11434')
 
-        # # Display top tracks
-        # st.subheader("Your Top 5 Tracks")
-        # for track in data["top_tracks"]:
-        #     name = track["name"]
-        #     artists = ", ".join([artist["name"] for artist in track["artists"]])
-        #     st.markdown(f"**{name}** by *{artists}*")
-
-        # # Display top genres
-        # st.subheader("Your Top Genres")
-        # genres = ", ".join(data["top_genres"])
-        # st.markdown(f"**Genres:** {genres}")
-
-        # Chat interaction
+        # Initialize session states for messages and chat state
         if "messages" not in st.session_state:
-            st.session_state.messages = [{"role": "assistant", "content": "Hi! Tell me how you're feeling today?"}]
+            st.session_state.messages = []
 
+        if "chat_active" not in st.session_state:
+            st.session_state.chat_active = True
+
+        # Define Assistant Persona
+        ASSISTANT_PERSONA = """You are a helpful and empathetic AI assistant. Your responses should be:
+        1. Helpful and informative
+        2. Empathetic to the user's emotional state
+        3. Brief and concise
+        4. Professional yet friendly
+
+        Additionally, you should subtly acknowledge the user's mood in your responses without explicitly stating it.
+        For example, if the user seems frustrated, be extra patient and understanding.
+        If they seem happy, match their positive energy.
+        If they seem sad, offer gentle encouragement."""
         for message in st.session_state.messages:
             with st.chat_message(message["role"]):
                 st.markdown(message["content"])
+                
+        # End chat button
+        if st.button("End Chat"):
+            st.session_state.chat_active = False
+            user_messages = [m["content"] for m in st.session_state.messages if m["role"] == "user"]
 
-        user_input = st.chat_input("Type your message here...")
+            mood_prompt = f"""
+            You are an expert emotion analyst. Based on the following user's messages, identify their emotional state throughout the chat.
+            Summarize it into a **single keyword** (e.g., happy, frustrated, sad, excited, anxious, etc.).
 
-        if user_input:
-            st.session_state.messages.append({"role": "user", "content": user_input})
+            User messages:
+            {chr(10).join(user_messages)}
 
-            # Send the message to your backend API for processing
-            response = requests.post(f"{BACKEND_URL}/process-chat", json={"spotify_id": spotify_id, "message": user_input})
-            if response.status_code == 200:
-                bot_response = response.json().get("response", "I'm still learning! You said: " + user_input)
-            else:
-                bot_response = "Error in processing your input."
+            Respond with just one word:
+            """
 
-            st.session_state.messages.append({"role": "assistant", "content": bot_response})
+            mood_response = client.chat(model='llama3.2', messages=[{"role": "user", "content": mood_prompt}])
+            user_mood = mood_response["message"]["content"].strip().split()[0]  # Get just the first word
+
+            st.success(f"The user's overall mood during the chat was: **{user_mood.capitalize()}**")
+
+            st.info("Chat has ended. Start a new conversation by refreshing the page.")
+            if st.session_state.chat_active:
+                if prompt := st.chat_input("Say something"):
+                    # Add user message to chat history
+                    st.session_state.messages.append({"role": "user", "content": prompt})
+                    with st.chat_message("user"):
+                        st.markdown(prompt)
+
+                    # Truncate history to the last 6 messages (3 user + 3 assistant)
+                    st.session_state.messages = st.session_state.messages[-6:]
+
+                    # Generate response using Ollama with persona-based prompting
+                    system_message = {"role": "system", "content": ASSISTANT_PERSONA}
+                    
+                    # Prepare messages for the chat, including the system message
+                    chat_messages = [system_message]
+
+                    # Add conversation history (limited to last 5 exchanges)
+                    for m in st.session_state.messages[-10:]:  # Last 5 exchanges (10 messages)
+                        chat_messages.append({"role": m["role"], "content": m["content"]})
+
+                    # Add the current user message
+                    chat_messages.append({"role": "user", "content": prompt})
+
+                    # Get response from Ollama
+                    response = client.chat(model='llama3.2', messages=chat_messages)
+                    msg = response['message']['content']
+
+                    # Display and store assistant response
+                    with st.chat_message("assistant"):
+                        st.markdown(msg)
+                    st.session_state.messages.append({"role": "assistant", "content": msg})
 
     else:
         st.error("Something went wrong fetching your data.")
