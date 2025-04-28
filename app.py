@@ -7,7 +7,7 @@ BACKEND_URL = "https://personalai-playlist-generator.onrender.com"
 st.set_page_config(page_title="Spotify Demo", page_icon="🎵")
 st.title("🎵 Spotify Login Demo")
 
-query_params = {"spotify_id":383299}
+query_params = st.query_params
 if "spotify_id" in query_params:
     spotify_id = query_params["spotify_id"]
     st.success("Logged in successfully!")
