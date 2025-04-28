@@ -61,7 +61,7 @@ if "spotify_id" in query_params:
                 Respond with just one word:
                 """
 
-                mood_response = client.chat(model='llama3.2', messages=[{"role": "user", "content": mood_prompt}])
+                mood_response = client.chat(model='llama3.2-16000', messages=[{"role": "user", "content": mood_prompt}])
                 user_mood = mood_response["message"]["content"].strip().split()[0]  # Get just the first word
 
                 st.success(f"The user's overall mood during the chat was: **{user_mood.capitalize()}**")
