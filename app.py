@@ -8,15 +8,10 @@ st.set_page_config(page_title="Spotify Demo", page_icon="🎵")
 st.title("🎵 Spotify Login Demo")
 
 query_params = st.query_params
+# query_params = {"spotify_id":23}
 if "spotify_id" in query_params:
     spotify_id = query_params["spotify_id"]
     st.success("Logged in successfully!")
-
-    res = requests.get(f"{BACKEND_URL}/user-info/{spotify_id}")
-    spotify_id = query_params["spotify_id"]
-
-    st.success("Logged in successfully!{spotify_id}")
-
     try:
         client = ollama.Client(host='http://10.0.4.191:11434')
         st.title("Chat with Ollama")
@@ -102,9 +97,6 @@ if "spotify_id" in query_params:
                     st.markdown(msg)
                 st.session_state.messages.append({"role": "assistant", "content": msg})
             # Analyze user's mood based on conversation history
-           
-        else:
-            st.error("Something went wrong fetching your data.")
     
     except requests.exceptions.RequestException as e:
         st.error(f"Error fetching data: {e}")
