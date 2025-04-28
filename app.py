@@ -11,7 +11,11 @@ query_params = st.query_params
 if "spotify_id" in query_params:
     spotify_id = query_params["spotify_id"]
 
+<<<<<<< HEAD
     st.success("Logged in successfully!{spotify_id}")
+=======
+    st.header(f"Welcome, {spotify_id}")
+>>>>>>> b48ee32db136739b624c4cd4c36c47c3a45c1af8
 
     try:
         # Fetch user info
