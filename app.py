@@ -14,6 +14,7 @@ if "spotify_id" in query_params:
     st.success("Logged in successfully!")
     st.success(spotify_id)
     try:
+        res = requests.get(f"{BACKEND_URL}/user-info/{spotify_id}")
         client = ollama.Client(host='http://10.0.4.191:11434')
         st.title("Chat with Ollama")
          
