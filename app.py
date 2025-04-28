@@ -11,7 +11,7 @@ query_params = st.query_params
 if "spotify_id" in query_params:
     spotify_id = query_params["spotify_id"]
 
-    st.success("Logged in successfully! {spotify_id}")
+    st.header(f"Welcome, {spotify_id}")
 
     try:
         # Fetch user info
