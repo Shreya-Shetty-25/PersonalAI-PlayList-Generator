@@ -1,5 +1,6 @@
 # main.py
 import os
+import sqlite3
 import requests
 import time
 from fastapi import FastAPI, Request
@@ -76,10 +77,10 @@ def spotify_callback(request: Request):
     try:
         token_data = response.json()
     except Exception:
-        print("⚠️ Token exchange failed with non-JSON response:", response.text)
+        print("Token exchange failed with non-JSON response:", response.text)
         return JSONResponse({"error": "Token exchange failed"})
 
-    print("🎟 Token data:", token_data)
+    print("Token data:", token_data)
 
     access_token = token_data.get("access_token")
     refresh_token = token_data.get("refresh_token")
@@ -95,7 +96,7 @@ def spotify_callback(request: Request):
     try:
         user_info = user_response.json()
     except Exception:
-        print("⚠️ User info fetch failed:", user_response.text)
+        print("User info fetch failed:", user_response.text)
         return JSONResponse({"error": "Failed to get user info"})
 
     spotify_user_id = user_info.get("id")
@@ -119,14 +120,14 @@ def spotify_callback(request: Request):
 def get_user_info(spotify_user_id: str):
     session = spotify_sessions.get(spotify_user_id)
     if not session:
-        print(f"❌ No session found for user: {spotify_user_id}")
+        print(f"No session found for user: {spotify_user_id}")
         return {"error": "User not found"}
 
     # Refresh if expired
     if int(time.time()) >= session["expires_at"]:
         new_token, expires_in = refresh_access_token(session["refresh_token"])
         if not new_token:
-            print(f"❌ Failed to refresh token for {spotify_user_id}")
+            print(f" Failed to refresh token for {spotify_user_id}")
             return {"error": "Could not refresh token"}
 
         session["access_token"] = new_token
@@ -139,10 +140,76 @@ def get_user_info(spotify_user_id: str):
     )
 
     if tracks_res.status_code != 200:
-        print("⚠️ Error fetching top tracks:", tracks_res.text)
+        print(" Error fetching top tracks:", tracks_res.text)
         return {"error": "Failed to fetch top tracks"}
 
     return {
         "display_name": session["display_name"],
         "top_tracks": tracks_res.json().get("items", [])
+    }
+
+def save_user_data(spotify_user_id, display_name, top_tracks, top_artists, top_genres):
+    conn = sqlite3.connect("spotify_sessions.db")
+    cursor = conn.cursor()
+
+    cursor.execute('''
+        INSERT OR REPLACE INTO user_data (spotify_id, display_name, top_tracks, top_artists, top_genres)
+        VALUES (?, ?, ?, ?, ?)
+    ''', (spotify_user_id, display_name, top_tracks, top_artists, top_genres))
+
+    conn.commit()
+    conn.close()
+
+@app.get("/user-info/{spotify_user_id}")
+def get_user_info(spotify_user_id: str):
+    session = spotify_sessions.get(spotify_user_id)
+    if not session:
+        return {"error": "User not found"}
+
+    # Refresh if expired
+    if int(time.time()) >= session["expires_at"]:
+        new_token, expires_in = refresh_access_token(session["refresh_token"])
+        if not new_token:
+            return {"error": "Could not refresh token"}
+
+        session["access_token"] = new_token
+        session["expires_at"] = int(time.time()) + expires_in
+
+    headers = {"Authorization": f"Bearer {session['access_token']}"}
+    
+    # Fetch top tracks
+    tracks_res = requests.get(
+        "https://api.spotify.com/v1/me/top/tracks?limit=5", headers=headers
+    )
+
+    if tracks_res.status_code != 200:
+        return {"error": "Failed to fetch top tracks"}
+
+    tracks = tracks_res.json().get("items", [])
+    top_tracks = ",".join([t["name"] for t in tracks])
+
+    # Fetch top artists
+    artists_res = requests.get("https://api.spotify.com/v1/me/top/artists?limit=5", headers=headers)
+    if artists_res.status_code != 200:
+        return {"error": "Failed to fetch top artists"}
+
+    artists = artists_res.json().get("items", [])
+    top_artists = ",".join([a["name"] for a in artists])
+
+    # Extract top genres from the artists
+    top_genres = set()
+    for artist in artists:
+        top_genres.update(artist.get("genres", []))
+    
+    # Join genres into a string
+    top_genres_str = ",".join(top_genres)
+
+    # Save user data to SQLite
+    save_user_data(spotify_user_id, session["display_name"], top_tracks, top_artists, top_genres_str)
+
+    return {
+        "display_name": session["display_name"],
+        "top_tracks": tracks,
+        "top_artists": artists,
+        "top_genres": list(top_genres),
     }
