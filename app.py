@@ -7,16 +7,17 @@ BACKEND_URL = "https://personalai-playlist-generator.onrender.com"
 st.set_page_config(page_title="Spotify Demo", page_icon="🎵")
 st.title("🎵 Spotify Login Demo")
 
-query_params = st.query_params
+query_params = {"spotify_id":383299}
 if "spotify_id" in query_params:
+    spotify_id = query_params["spotify_id"]
+    st.success("Logged in successfully!")
+
+    res = requests.get(f"{BACKEND_URL}/user-info/{spotify_id}")
     spotify_id = query_params["spotify_id"]
 
     st.success("Logged in successfully!{spotify_id}")
 
     try:
-        # Fetch user info
-        res = requests.get(f"{BACKEND_URL}/user-info/{spotify_id}")
-        
         client = ollama.Client(host='http://10.0.4.191:11434')
         st.title("Chat with Ollama")
          
@@ -58,7 +59,7 @@ if "spotify_id" in query_params:
             Respond with just one word:
             """
          
-            mood_response = client.chat(model='llama3.2-16000', messages=[{"role": "user", "content": mood_prompt}])
+            mood_response = client.chat(model='llama3', messages=[{"role": "user", "content": mood_prompt}])
             user_mood = mood_response["message"]["content"].strip().split()[0]  # Get just the first word
          
             st.success(f"The user's overall mood during the chat was: **{user_mood.capitalize()}**")
@@ -93,7 +94,7 @@ if "spotify_id" in query_params:
                 chat_messages.append({"role": "user", "content": prompt})
                
                 # Get response from Ollama
-                response = client.chat(model='llama3.2-16000', messages=chat_messages)
+                response = client.chat(model='llama3', messages=chat_messages)
                 msg = response['message']['content']
          
                 # Display and store assistant response
@@ -102,7 +103,6 @@ if "spotify_id" in query_params:
                 st.session_state.messages.append({"role": "assistant", "content": msg})
             # Analyze user's mood based on conversation history
            
-
         else:
             st.error("Something went wrong fetching your data.")
     
