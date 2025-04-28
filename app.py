@@ -11,7 +11,7 @@ query_params = st.query_params
 if "spotify_id" in query_params:
     spotify_id = query_params["spotify_id"]
 
-    st.success("Logged in successfully!")
+    st.success("Logged in successfully!",spotify_id)
 
     try:
         # Fetch user info
@@ -19,7 +19,7 @@ if "spotify_id" in query_params:
         
         if res.status_code == 200:
             user_data = res.json()  # Assuming response is JSON and contains user-related data
-            
+            print(user_data)
             client = ollama.Client(host='http://10.0.4.191:11434')
 
             # Initialize session states for messages and chat state
@@ -91,8 +91,9 @@ if "spotify_id" in query_params:
                     chat_messages.append({"role": "user", "content": prompt})
 
                     # Get response from Ollama
-                    response = client.chat(model='llama3.2', messages=chat_messages)
+                    response = client.chat(model='llama3.2-16000', messages=chat_messages)
                     msg = response['message']['content']
+                    st.write("Ollama Response:", response)
 
                     # Display and store assistant response
                     with st.chat_message("assistant"):
