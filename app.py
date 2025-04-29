@@ -104,8 +104,11 @@ if "spotify_id" in query_params:
                             "Content-Type": "application/json"
                         },
                         json={
-                            "model": "openai/gpt-4.1-nano",  # You can change the model as needed
-                            "messages": messages
+                          "model": "anthropic/claude-3-sonnet:beta",
+                          "messages": [
+                            {"role": "system", "content": "You are a kind and emotionally intelligent assistant who acts like a supportive friend. You help the user express their feelings in a safe, open conversation."},
+                          ],
+                          "max_tokens": 1000
                         }
                     )
                     
