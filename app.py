@@ -104,7 +104,7 @@ if "spotify_id" in query_params:
                             "Content-Type": "application/json"
                         },
                         json={
-                            "model": "anthropic/claude-3-sonnet:beta",  # You can change the model as needed
+                            "model": "openai/gpt-4.1-nano",  # You can change the model as needed
                             "messages": messages
                         }
                     )
