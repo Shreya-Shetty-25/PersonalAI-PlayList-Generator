@@ -115,7 +115,7 @@ if "spotify_id" in query_params:
                     if response.status_code == 200:
                         response_data = response.json()
                         
-                        st.write(response_data)
+                        # st.write(response_data)
                         assistant_response = response_data["choices"][0]["message"]["content"]
                         # Update UI with response
                         message_placeholder.write(assistant_response)
