@@ -306,4 +306,3 @@ def get_user_top_artists(spotify_id: str, time_range: str = "medium_term", limit
     except HTTPException as e:
         return JSONResponse(status_code=e.status_code, content={"error": e.detail})
 
-
