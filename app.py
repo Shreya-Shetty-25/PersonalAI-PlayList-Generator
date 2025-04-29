@@ -104,7 +104,7 @@ if "spotify_id" in query_params:
                             "Content-Type": "application/json"
                         },
                         json={
-                          "model": "anthropic/claude-3.7-sonnet",
+                          "model": "nvidia/llama-3.1-nemotron-ultra-253b-v1:free",
                           "messages": [
                             {"role": "system", "content": "You are a kind and emotionally intelligent assistant who acts like a supportive friend. You help the user express their feelings in a safe, open conversation."},
                           ],
