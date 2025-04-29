@@ -89,7 +89,7 @@ if "spotify_id" in query_params:
                 with st.spinner("Thinking..."):
                     # Prepare the conversation history for the API
                     messages = [
-                        {"role": "system", "content": "You are friendly conversational chatbot"},
+                        {"role": "system", "content": "You are friendly conversational chatbot.Keep the conversation engaging and friendly."},
                     ]
                     
                     # Add conversation history
@@ -138,11 +138,3 @@ else:
     login_url = f"{BACKEND_URL}/login-spotify"
     st.markdown(f"[👉 Login with Spotify]({login_url})", unsafe_allow_html=True)
     
-    # Explain what users can do
-    st.markdown("""
-    ### What you can do after logging in:
-    - Get personalized music recommendations
-    - Discover new artists based on your listening history
-    - Create thematic playlists for different moods or activities
-    - Learn interesting facts about your favorite artists
-    """)
