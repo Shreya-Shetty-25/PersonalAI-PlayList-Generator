@@ -44,7 +44,7 @@ if "spotify_user_info" not in st.session_state:
 
 # Page header
 st.title("🎵 AI Music Assistant")
-st.success(f"Welcome, {OPENROUTER_API_KEY}!")
+
 
 # Check for Spotify login status
 query_params = st.query_params
@@ -89,7 +89,7 @@ if "spotify_id" in query_params:
                 with st.spinner("Thinking..."):
                     # Prepare the conversation history for the API
                     messages = [
-                        {"role": "system", "content": "You are a helpful music assistant that helps users discover new music, create playlists, and learn about artists. You have access to the user's Spotify listening history and can reference it to provide personalized recommendations."},
+                        {"role": "system", "content": "You are friendly conversational chatbot"},
                     ]
                     
                     # Add conversation history
@@ -104,11 +104,9 @@ if "spotify_id" in query_params:
                             "Content-Type": "application/json"
                         },
                         json={
-                          "model": "nvidia/llama-3.1-nemotron-ultra-253b-v1:free",
-                          "messages": [
-                            {"role": "system", "content": "You are a kind and emotionally intelligent assistant who acts like a supportive friend. You help the user express their feelings in a safe, open conversation."},
-                          ],
-                          "max_tokens": 1000
+                            "model": "nvidia/llama-3.1-nemotron-ultra-253b-v1:free",
+                            "messages": messages,
+                            "max_tokens": 500  # Adjust token size here if needed
                         }
                     )
                     
