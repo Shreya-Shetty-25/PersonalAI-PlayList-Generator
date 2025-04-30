@@ -1,14 +1,17 @@
 import streamlit as st
 import requests
 import re
-# st.set_page_config(page_title="Vibe Chatbot", layout="centered")
-OLLAMA_MODEL = "llama3.2-16000"
+import os
 
-# Streamlit UI setup
+# Load your OpenRouter API key from Streamlit secrets
+OPENROUTER_API_KEY = st.secrets["OPENROUTER_API_KEY"]
+OPENROUTER_URL = "https://openrouter.ai/api/v1/chat/completions"
+OPENROUTER_MODEL = "mistralai/mistral-7b-instruct"
 
+st.set_page_config(page_title="Vibe Chatbot", layout="centered")
 st.title("Conversational Chatbot")
 
-# LLM-based mood detection prompt
+# Prompts and configuration
 MOOD_DETECTION_PROMPT = '''
 You're an emotion detection AI assistant.
 
@@ -30,7 +33,6 @@ Format your response strictly as:
 Return the detected user mood:
 '''
 
-# Vibe styles
 VIBE_STYLE = {
     "happy": "Be energetic, playful, and use emojis. Keep things upbeat.",
     "sad": "Speak gently, with warmth and empathy. Be supportive and understanding.",
@@ -46,7 +48,6 @@ VIBE_STYLE = {
     "frustrated": "Stay calm and offer simple, encouraging replies."
 }
 
-# Personality
 SYSTEM_PROMPT = """
 You're a witty, laid-back AI friend who chats like a real person.
 You're casual, friendly, and speak like someone texting a friend—short sentences, natural tone, no robotic answers.
@@ -58,85 +59,87 @@ Keep responses under 3-4 lines max unless the user asks for more.
 
 VIBE_FLAVOR = "[The AI always replies with charm and humor, like a real friend texting back. No walls of text.]"
 
-# Chat history
 if "messages" not in st.session_state:
     st.session_state.messages = []
 
-# Display past messages
+# Display chat history
 for msg in st.session_state.messages:
     with st.chat_message(msg["role"]):
         st.markdown(msg["content"])
 
-# User input
+# Chat input
 prompt = st.chat_input("Talk to me...")
 
-# Function to extract JSON using regex
 def extract_json(response):
     match = re.search(r'{"mood":\s*"(.*?)"}', response)
     if match:
         return match.group(1)
     return "neutral"
 
-# Get last 4-5 chat messages (prioritizing user input)
 def format_recent_user_history(n=5):
     history = [m for m in st.session_state.messages if m["role"] == "user"][-n:]
     return "\n".join([f"User: {m['content']}" for m in history])
+
+def query_openrouter(model, messages, temperature=0.7):
+    headers = {
+        "Authorization": f"Bearer {OPENROUTER_API_KEY}",
+        "Content-Type": "application/json"
+    }
+    data = {
+        "model": model,
+        "messages": messages,
+        "temperature": temperature
+    }
+    response = requests.post(OPENROUTER_URL, headers=headers, json=data)
+    return response.json()["choices"][0]["message"]["content"]
 
 if prompt:
     st.session_state.messages.append({"role": "user", "content": prompt})
     with st.chat_message("user"):
         st.markdown(prompt)
 
-    # Use LLM to detect mood
+    # Detect mood
     mood_prompt = MOOD_DETECTION_PROMPT.format(chat_history=format_recent_user_history())
-    mood_response = requests.post(
-        "http://10.0.4.191:11434/api/generate",
-        json={
-            "model": OLLAMA_MODEL,
-            "prompt": mood_prompt,
-            "temperature": 0.7,
-            "num_predict": 100,
-            "stream": False
-        }
+    mood_response = query_openrouter(
+        OPENROUTER_MODEL,
+        messages=[{"role": "user", "content": mood_prompt}]
     )
-    user_mood = extract_json(mood_response.json()["response"])
+    user_mood = extract_json(mood_response)
     current_vibe = VIBE_STYLE.get(user_mood, VIBE_STYLE["neutral"])
 
-    # Prepare response generation prompt
+    # Generate bot response
+    recent_history = st.session_state.messages[-5:]
     formatted_history = "\n".join([
         f"User: {m['content']}" if m['role'] == 'user' else f"Assistant: {m['content']}"
-        for m in st.session_state.messages[-5:]
+        for m in recent_history
     ])
 
     full_prompt = f"""
-        {SYSTEM_PROMPT}
-        Current mood of the user: {user_mood}
-        Style instructions for this mood: {current_vibe}
-        Tone reminder: {VIBE_FLAVOR}
+{SYSTEM_PROMPT}
+Current mood of the user: {user_mood}
+Style instructions for this mood: {current_vibe}
+Tone reminder: {VIBE_FLAVOR}
 
-        Below is a conversation between a user and you, the assistant.
-        Focus especially on the user's most recent message to craft your response.
+Below is a conversation between a user and you, the assistant.
+Focus especially on the user's most recent message to craft your response.
 
-        --- Chat History ---
-        {formatted_history}
-        ---------------------
+--- Chat History ---
+{formatted_history}
+---------------------
 
-        Now respond to the last message:
-        last message:- {prompt}
-        """
+Now respond to the last message:
+last message:- {prompt}
+"""
 
-    response = requests.post(
-        "http://10.0.4.191:11434/api/generate",
-        json={
-            "model": OLLAMA_MODEL,
-            "prompt": full_prompt,
-            "temperature": 0.5,
-            "num_predict": 200,
-            "stream": False
-        }
+    bot_reply = query_openrouter(
+        OPENROUTER_MODEL,
+        messages=[
+            {"role": "system", "content": "You are a friendly music assistant."},
+            {"role": "user", "content": full_prompt}
+        ],
+        temperature=0.6
     )
 
-    bot_reply = response.json()["response"].strip()
     st.session_state.messages.append({"role": "assistant", "content": bot_reply})
     with st.chat_message("assistant"):
         st.markdown(bot_reply)
