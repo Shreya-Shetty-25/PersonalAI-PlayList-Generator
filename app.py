@@ -71,8 +71,8 @@ if "spotify_id" in query_params:
                     with st.chat_message("assistant"):
                         st.markdown(bot_reply)
 
-                else:
-                    st.error("Failed to fetch user information")
+            else:
+                st.error("Failed to fetch user information")
         except Exception as e:
             st.error(f"Error connecting to backend: {str(e)}")
     
