@@ -58,80 +58,12 @@ if "spotify_id" in query_params:
             if response.status_code == 200:
                 st.session_state.spotify_user_info = response.json()
                 st.success(f"Welcome, {st.session_state.spotify_user_info.get('display_name', 'User')}!")
+                import model
             else:
                 st.error("Failed to fetch user information")
         except Exception as e:
             st.error(f"Error connecting to backend: {str(e)}")
     
-    # Display chat interface
-    st.subheader("Chat with your AI Music Assistant")
-    
-    # Display chat messages
-    for message in st.session_state.messages:
-        with st.chat_message(message["role"]):
-            st.write(message["content"])
-    
-    # Chat input
-    if prompt := st.chat_input("What would you like to know about music?"):
-        # Add user message to chat history
-        st.session_state.messages.append({"role": "user", "content": prompt})
-        
-        # Display user message
-        with st.chat_message("user"):
-            st.write(prompt)
-        
-        # Display assistant response
-        with st.chat_message("assistant"):
-            message_placeholder = st.empty()
-            
-            # Call OpenRouter API
-            try:
-                with st.spinner("Thinking..."):
-                    # Prepare the conversation history for the API
-                    messages = [
-                        {"role": "system", "content": "You are friendly conversational chatbot.Keep the conversation engaging and friendly."},
-                    ]
-                    
-                    # Add conversation history
-                    for msg in st.session_state.messages:
-                        messages.append({"role": msg["role"], "content": msg["content"]})
-                    
-                    # Make API request to OpenRouter
-                    response = requests.post(
-                        "https://openrouter.ai/api/v1/chat/completions",
-                        headers={
-                            "Authorization": f"Bearer {OPENROUTER_API_KEY}",
-                            "Content-Type": "application/json"
-                        },
-                        json={
-                            "model": "nvidia/llama-3.1-nemotron-ultra-253b-v1:free",
-                            "messages": messages,
-                            "max_tokens": 500  # Adjust token size here if needed
-                        }
-                    )
-                    
-                    if response.status_code == 200:
-                        response_data = response.json()
-                        
-                        # st.write(response_data)
-                        assistant_response = response_data["choices"][0]["message"]["content"]
-                        # Update UI with response
-                        message_placeholder.write(assistant_response)
-                        
-                        # Add assistant response to chat history
-                        st.session_state.messages.append({"role": "assistant", "content": assistant_response})
-                    else:
-                        st.error(f"Error from OpenRouter API: {response.text}")
-                        message_placeholder.write("Sorry, I'm having trouble connecting to my AI brain. Please try again.")
-            except Exception as e:
-                st.error(f"Error processing request: {str(e)}")
-                message_placeholder.write("Sorry, something went wrong. Please try again.")
-    
-    # Add a button to clear chat history
-    if st.button("Clear Conversation"):
-        st.session_state.messages = []
-        st.rerun()
-
 else:
     # Login prompt screen
     st.info("Please login with your Spotify account to chat with your AI Music Assistant.")
