@@ -1,8 +1,5 @@
 import streamlit as st
 import requests
-from transformers import AutoTokenizer, AutoModelForSequenceClassification
-import torch
-import torch.nn.functional as F
 import re
 
 OLLAMA_MODEL = "llama3.2-16000"
