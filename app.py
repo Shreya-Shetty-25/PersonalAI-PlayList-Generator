@@ -16,17 +16,13 @@
 #     st.info("Please login with your Spotify account.")
 #     login_url = f"{BACKEND_URL}/login-spotify"
 #     st.markdown(f"[👉 Login with Spotify]({login_url})", unsafe_allow_html=True)
+from model import reply_from_bot
 import streamlit as st
 import requests
 import json
-import model
+import os
 from dotenv import load_dotenv
 
-st.set_page_config(
-    page_title="AI Music Assistant", 
-    page_icon="🎵",
-    layout="wide"
-)
 
 # Load environment variables
 load_dotenv()
@@ -58,10 +54,25 @@ if "spotify_id" in query_params:
             response = requests.get(f"{BACKEND_URL}/user-info/{spotify_id}")
             if response.status_code == 200:
                 st.session_state.spotify_user_info = response.json()
-                st.success(f"Welcome, {st.session_state.spotify_user_info.get('display_name', 'User')}!")
-                model.launch_music_assistant()
-            else:
-                st.error("Failed to fetch user information")
+                # st.title("Conversational Chatbot")
+                st.title(f"Welcome, {st.session_state.spotify_user_info.get('display_name', 'User')}!")
+                if "messages" not in st.session_state:
+                    st.session_state.messages = []
+                for msg in st.session_state.messages:
+                    with st.chat_message(msg["role"]):
+                        st.markdown(msg["content"])
+                prompt = st.chat_input("Talk to me...")
+                if prompt:
+                    st.session_state.messages.append({"role": "user", "content": prompt})
+                    with st.chat_message("user"):
+                        st.markdown(prompt)
+                    bot_reply=reply_from_bot(st.session_state.messages,prompt)
+                    st.session_state.messages.append({"role": "assistant", "content": bot_reply})
+                    with st.chat_message("assistant"):
+                        st.markdown(bot_reply)
+
+                else:
+                    st.error("Failed to fetch user information")
         except Exception as e:
             st.error(f"Error connecting to backend: {str(e)}")
     
