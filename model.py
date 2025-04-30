@@ -8,7 +8,7 @@ OPENROUTER_API_KEY = st.secrets["OPENROUTER_API_KEY"]
 OPENROUTER_URL = "https://openrouter.ai/api/v1/chat/completions"
 OPENROUTER_MODEL = "mistralai/mistral-7b-instruct"
 
-st.set_page_config(page_title="Vibe Chatbot", layout="centered")
+# st.set_page_config(page_title="Vibe Chatbot", layout="centered")
 st.title("Conversational Chatbot")
 
 # Prompts and configuration
