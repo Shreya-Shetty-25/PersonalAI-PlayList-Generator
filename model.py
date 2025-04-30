@@ -1,7 +1,7 @@
 import streamlit as st
 import requests
 import re
-st.set_page_config(page_title="Vibe Chatbot", layout="centered")
+# st.set_page_config(page_title="Vibe Chatbot", layout="centered")
 OLLAMA_MODEL = "llama3.2-16000"
 
 # Streamlit UI setup
