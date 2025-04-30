@@ -19,7 +19,7 @@
 import streamlit as st
 import requests
 import json
-import os
+import model
 from dotenv import load_dotenv
 
 st.set_page_config(
@@ -59,7 +59,7 @@ if "spotify_id" in query_params:
             if response.status_code == 200:
                 st.session_state.spotify_user_info = response.json()
                 st.success(f"Welcome, {st.session_state.spotify_user_info.get('display_name', 'User')}!")
-                import model
+                model.launch_music_assistant()
             else:
                 st.error("Failed to fetch user information")
         except Exception as e:
