@@ -94,7 +94,14 @@ def query_openrouter(model, messages, temperature=0.7):
         "temperature": temperature
     }
     response = requests.post(OPENROUTER_URL, headers=headers, json=data)
-    return response.json()["choices"][0]["message"]["content"]
+
+    try:
+        response_json = response.json()
+        return response_json["choices"][0]["message"]["content"]
+    except Exception as e:
+        print("Error response from OpenRouter:", response.text)
+        raise RuntimeError("OpenRouter API call failed") from e
+
 
 def reply_from_bot(chat_messages,latest_user_message):
     mood_prompt = MOOD_DETECTION_PROMPT.format(chat_history=format_recent_user_history(chat_messages))
