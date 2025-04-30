@@ -22,6 +22,12 @@ import json
 import os
 from dotenv import load_dotenv
 
+st.set_page_config(
+    page_title="AI Music Assistant", 
+    page_icon="🎵",
+    layout="wide"
+)
+
 # Load environment variables
 load_dotenv()
 
@@ -29,11 +35,6 @@ load_dotenv()
 BACKEND_URL = "https://personalai-playlist-generator.onrender.com"
 OPENROUTER_API_KEY = st.secrets["OPENROUTER_API_KEY"]
 
-st.set_page_config(
-    page_title="AI Music Assistant", 
-    page_icon="🎵",
-    layout="wide"
-)
 
 # Initialize session state for chat history
 if "messages" not in st.session_state:
