@@ -2,12 +2,15 @@ import streamlit as st
 import requests
 import re
 import os
+from together import Together
 
 
 # Load your OpenRouter API key from Streamlit secrets
-OPENROUTER_API_KEY = st.secrets["OPENROUTER_API_KEY"]
+# OPENROUTER_API_KEY = st.secrets["OPENROUTER_API_KEY"]
+OPENROUTER_API_KEY = "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"
 OPENROUTER_URL = "https://openrouter.ai/api/v1/chat/completions"
 OPENROUTER_MODEL = "deepseek/deepseek-r1-distill-llama-70b:free"
+TOGETHER_API_KEY=st.secrets["TOGETHER_API_KEY"]
 
 MOOD_DETECTION_PROMPT = '''
 You're an emotion detection AI assistant.
@@ -82,9 +85,18 @@ def query_openrouter(model, messages, temperature=0.7):
 
     try:
         response_json = response.json()
+        print(response_json)
         return response_json["choices"][0]["message"]["content"]
     except Exception as e:
-        raise RuntimeError("OpenRouter API call failed") from e
+        # raise RuntimeError("OpenRouter API call failed") from e
+        client = Together(api_key=TOGETHER_API_KEY)
+        response = client.chat.completions.create(
+        model="meta-llama/Llama-3.3-70B-Instruct-Turbo-Free",  # Or any other Together-hosted model
+        messages=messages,
+        temperature=temperature,
+        max_tokens=300
+    )
+    return response.choices[0].message.content
 
 
 def reply_from_bot(chat_messages,latest_user_message):
