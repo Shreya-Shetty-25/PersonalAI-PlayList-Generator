@@ -6,10 +6,8 @@ import os
 
 # Load your OpenRouter API key from Streamlit secrets
 OPENROUTER_API_KEY = st.secrets["OPENROUTER_API_KEY"]
-
-
 OPENROUTER_URL = "https://openrouter.ai/api/v1/chat/completions"
-OPENROUTER_MODEL = "meta-llama/llama-3.2-3b-instruct:free"
+OPENROUTER_MODEL = "deepseek/deepseek-r1-distill-llama-70b:free"
 
 MOOD_DETECTION_PROMPT = '''
 You're an emotion detection AI assistant.
@@ -84,10 +82,8 @@ def query_openrouter(model, messages, temperature=0.7):
 
     try:
         response_json = response.json()
-        print(response_json)
         return response_json["choices"][0]["message"]["content"]
     except Exception as e:
-        print("Error response from OpenRouter:", response.text)
         raise RuntimeError("OpenRouter API call failed") from e
 
 
@@ -108,21 +104,18 @@ def reply_from_bot(chat_messages,latest_user_message):
     ])
 
     full_prompt = f"""
-{SYSTEM_PROMPT}
-Current mood of the user: {user_mood}
-Style instructions for this mood: {current_vibe}
-Tone reminder: {VIBE_FLAVOR}
-
-Below is a conversation between a user and you, the assistant.
-Focus especially on the user's most recent message to craft your response.
-
---- Chat History ---
-{formatted_history}
----------------------
-
-Now respond to the last message:
-last message:- {latest_user_message}
-"""
+        {SYSTEM_PROMPT}
+        Current mood of the user: {user_mood}
+        Style instructions for this mood: {current_vibe}
+        Tone reminder: {VIBE_FLAVOR}
+        Below is a conversation between a user and you, the assistant.
+        Focus especially on the user's most recent message to craft your response.
+        --- Chat History ---
+        {formatted_history}
+        ---------------------
+        Now respond to the last message:
+        last message:- {latest_user_message}
+        """
 
     bot_reply = query_openrouter(
         OPENROUTER_MODEL,
