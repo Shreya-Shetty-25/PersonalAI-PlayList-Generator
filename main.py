@@ -1,11 +1,13 @@
 import os
 import time
-from fastapi import FastAPI, Request, HTTPException
+from fastapi import FastAPI, Request, HTTPException, Body
 from fastapi.responses import RedirectResponse, JSONResponse
 from fastapi.middleware.cors import CORSMiddleware
 from typing import Dict, Any, Optional
 from dotenv import load_dotenv
 import requests
+from pydantic import BaseModel
+from model import reply_from_bot
 
 load_dotenv()
 
@@ -185,4 +187,18 @@ def get_user_top_artists(spotify_id: str, time_range: str = "medium_term", limit
         return response.json()
     except HTTPException as e:
         return JSONResponse(status_code=e.status_code, content={"error": e.detail})
+
+class ChatRequest(BaseModel):
+    spotify_id: str
+    messages: list
+    prompt: str
+
+@app.post("/chat")
+def chat_endpoint(data: ChatRequest):
+    # Optionally, you can validate spotify_id/session here
+    try:
+        reply = reply_from_bot(data.messages, data.prompt)
+        return {"reply": reply}
+    except Exception as e:
+        return JSONResponse(status_code=500, content={"error": str(e)})
 

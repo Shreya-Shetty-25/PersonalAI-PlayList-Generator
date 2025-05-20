@@ -6,8 +6,7 @@ from together import Together
 
 
 # Load your OpenRouter API key from Streamlit secrets
-# OPENROUTER_API_KEY = st.secrets["OPENROUTER_API_KEY"]
-OPENROUTER_API_KEY = "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"
+OPENROUTER_API_KEY = st.secrets["OPENROUTER_API_KEY"]
 OPENROUTER_URL = "https://openrouter.ai/api/v1/chat/completions"
 OPENROUTER_MODEL = "deepseek/deepseek-r1-distill-llama-70b:free"
 TOGETHER_API_KEY=st.secrets["TOGETHER_API_KEY"]
