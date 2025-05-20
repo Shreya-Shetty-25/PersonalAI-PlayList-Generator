@@ -171,21 +171,30 @@ st.markdown("""
         background-color: #67AE6E !important;
     }
     
-    /* Fix chat container to have chat input at bottom */
+    /* Fix chat container to have chat input permanently at bottom */
     .chat-container {
         display: flex;
         flex-direction: column;
         height: 70vh;
+        position: relative;
     }
     
     .chat-messages {
         flex-grow: 1;
         overflow-y: auto;
-        margin-bottom: 20px;
+        margin-bottom: 70px; /* Make room for input at bottom */
+        padding-bottom: 10px;
     }
     
     .chat-input {
-        margin-top: auto;
+        position: absolute;
+        bottom: 0;
+        left: 0;
+        right: 0;
+        padding: 10px;
+        background-color: rgba(225, 238, 188, 0.8);
+        border-radius: 15px;
+        z-index: 100;
     }
 </style>
 """, unsafe_allow_html=True)
@@ -266,7 +275,7 @@ with container:
                         st.markdown(msg["content"])
                 st.markdown('</div>', unsafe_allow_html=True)
                 
-                # Chat input at bottom
+                # Chat input fixed at bottom
                 st.markdown('<div class="chat-input">', unsafe_allow_html=True)
                 prompt = st.chat_input("Ask for mood-based playlist recommendations...")
                 st.markdown('</div>', unsafe_allow_html=True)
