@@ -13,7 +13,7 @@ BACKEND_URL = "https://personalai-playlist-generator.onrender.com"
 
 # Set page configuration with custom theme
 st.set_page_config(
-    page_title="AI Music Assistant",
+    page_title="Mood-Based Playlist Generator",
     page_icon="🎵",
     layout="wide"
 )
@@ -36,18 +36,18 @@ if "bubbles" not in st.session_state:
         } for _ in range(15)
     ]
 
-# Custom CSS for the app design
+# Custom CSS for the app design with updated color scheme
 st.markdown("""
 <style>
     /* Main background and text styles */
     .stApp {
-        background: linear-gradient(135deg, #e0f7fa 0%, #80deea 100%);
-        color: #1a237e;
+        background: linear-gradient(135deg, #E1EEBC 0%, #90C67C 100%);
+        color: #333;
     }
     
     /* Header styling */
     h1, h2, h3 {
-        color: #0d47a1;
+        color: #328E6E;
         font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
     }
     
@@ -61,17 +61,17 @@ st.markdown("""
     
     /* User message styling */
     .stChatMessage[data-testid="stChatMessageUser"] {
-        background-color: #bbdefb !important;
+        background-color: #E1EEBC !important;
     }
     
     /* Assistant message styling */
     .stChatMessage[data-testid="stChatMessageAssistant"] {
-        background-color: #e3f2fd !important;
+        background-color: #90C67C !important;
     }
     
     /* Custom button styling */
     .stButton button {
-        background-color: #1976d2;
+        background-color: #328E6E;
         color: white;
         border-radius: 25px;
         padding: 10px 20px;
@@ -81,14 +81,14 @@ st.markdown("""
     }
     
     .stButton button:hover {
-        background-color: #0d47a1;
+        background-color: #67AE6E;
         transform: scale(1.05);
     }
     
     /* Input field styling */
     .stTextInput input {
         border-radius: 25px;
-        border: 2px solid #1976d2;
+        border: 2px solid #328E6E;
         padding: 10px;
     }
     
@@ -104,7 +104,7 @@ st.markdown("""
     /* Login button styling */
     .login-button {
         display: inline-block;
-        background-color: #093013; /* Spotify green */
+        background-color: #328E6E; 
         color: white;
         padding: 12px 24px;
         border-radius: 30px;
@@ -116,7 +116,28 @@ st.markdown("""
     }
     
     .login-button:hover {
-        background-color: #093013;
+        background-color: #67AE6E;
+        transform: translateY(-2px);
+        box-shadow: 0 6px 8px rgba(0, 0, 0, 0.15);
+    }
+    
+    /* Signup button styling */
+    .signup-button {
+        display: inline-block;
+        background-color: #67AE6E; 
+        color: white;
+        padding: 12px 24px;
+        border-radius: 30px;
+        text-decoration: none;
+        font-weight: bold;
+        margin-top: 15px;
+        margin-left: 10px;
+        box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+        transition: all 0.3s ease;
+    }
+    
+    .signup-button:hover {
+        background-color: #90C67C;
         transform: translateY(-2px);
         box-shadow: 0 6px 8px rgba(0, 0, 0, 0.15);
     }
@@ -125,10 +146,11 @@ st.markdown("""
     .bubble {
         position: fixed;
         border-radius: 50%;
-        background: radial-gradient(circle at 30% 30%, rgba(255, 255, 255, 0.8), rgba(255, 255, 255, 0.4));
-        box-shadow: 0 0 10px rgba(255, 255, 255, 0.5), inset 0 0 10px rgba(255, 255, 255, 0.5);
+        background: radial-gradient(circle at 30% 30%, rgba(225, 238, 188, 0.8), rgba(144, 198, 124, 0.4));
+        box-shadow: 0 0 10px rgba(225, 238, 188, 0.5), inset 0 0 10px rgba(144, 198, 124, 0.5);
         z-index: -1;
         animation: float 20s infinite ease-in-out;
+        opacity: 0.6;
     }
     
     @keyframes float {
@@ -139,10 +161,36 @@ st.markdown("""
             transform: translateY(-20px) rotate(5deg);
         }
     }
+    
+    /* Custom message icons */
+    .user-icon {
+        background-color: #328E6E !important;
+    }
+    
+    .assistant-icon {
+        background-color: #67AE6E !important;
+    }
+    
+    /* Fix chat container to have chat input at bottom */
+    .chat-container {
+        display: flex;
+        flex-direction: column;
+        height: 70vh;
+    }
+    
+    .chat-messages {
+        flex-grow: 1;
+        overflow-y: auto;
+        margin-bottom: 20px;
+    }
+    
+    .chat-input {
+        margin-top: auto;
+    }
 </style>
 """, unsafe_allow_html=True)
 
-# Create floating bubbles
+# Create floating bubbles with updated colors
 bubble_html = ""
 for i, bubble in enumerate(st.session_state.bubbles):
     size = bubble["size"]
@@ -175,8 +223,8 @@ with container:
         st.markdown("""
         <div style="text-align: center; padding: 20px 0;">
             <h1 style="font-size: 2.5rem;">
-                <span style="color: #093013;">🎵</span> 
-                AI Music Assistant
+                <span style="color: #328E6E;">🎵</span> 
+                Mood-Based Playlist Generator
             </h1>
         </div>
         """, unsafe_allow_html=True)
@@ -205,33 +253,39 @@ with container:
                 st.markdown(f"""
                 <div class="welcome-card">
                     <h2 style="margin-bottom: 10px;">Welcome, {user_name}! 👋</h2>
-                    <p style="font-size: 1.1rem;">I'm your personal AI music assistant. Ask me about music recommendations, 
-                    creating playlists, or anything music-related!</p>
                 </div>
                 """, unsafe_allow_html=True)
                 
+                # Chat container with fixed bottom input
+                st.markdown('<div class="chat-container">', unsafe_allow_html=True)
+                
                 # Chat history display
-                chat_container = st.container()
-                with chat_container:
-                    for msg in st.session_state.messages:
-                        with st.chat_message(msg["role"]):
-                            st.markdown(msg["content"])
-
-                # Chat input
-                prompt = st.chat_input("Ask about music recommendations, playlists, or artists...")
+                st.markdown('<div class="chat-messages">', unsafe_allow_html=True)
+                for msg in st.session_state.messages:
+                    with st.chat_message(msg["role"], avatar="👤" if msg["role"] == "user" else "🎵"):
+                        st.markdown(msg["content"])
+                st.markdown('</div>', unsafe_allow_html=True)
+                
+                # Chat input at bottom
+                st.markdown('<div class="chat-input">', unsafe_allow_html=True)
+                prompt = st.chat_input("Ask for mood-based playlist recommendations...")
+                st.markdown('</div>', unsafe_allow_html=True)
+                
+                st.markdown('</div>', unsafe_allow_html=True)  # Close chat container
 
                 if prompt:
                     st.session_state.messages.append({"role": "user", "content": prompt})
-                    with st.chat_message("user"):
+                    with st.chat_message("user", avatar="👤"):
                         st.markdown(prompt)
                         
                     # Simulate typing with a spinner
-                    with st.chat_message("assistant"):
+                    with st.chat_message("assistant", avatar="🎵"):
                         with st.spinner("Thinking..."):
                             bot_reply = reply_from_bot(st.session_state.messages, prompt)
                             st.markdown(bot_reply)
                             
                     st.session_state.messages.append({"role": "assistant", "content": bot_reply})
+                    st.experimental_rerun()  # Rerun to refresh the chat layout
                     
                 # Add a clear chat button
                 if st.session_state.messages and st.button("Clear Chat"):
@@ -242,47 +296,29 @@ with container:
                 st.error("Failed to fetch user information. Please try logging in again.")
                 
         else:
-            # Login screen with improved styling
+            # Login screen with updated styling and removed Spotify logo
             st.markdown("""
             <div class="welcome-card" style="text-align: center;">
-                <h2 style="margin-bottom: 15px;">Your Personal Music AI Assistant</h2>
-                <p style="font-size: 1.2rem; margin-bottom: 20px;">Connect with Spotify to get personalized music recommendations, create playlists, and discover new artists!</p>
-                <img src="https://storage.googleapis.com/pr-newsroom-wp/1/2018/11/Spotify_Logo_RGB_Green.png" style="width: 180px; margin-bottom: 20px;">
+                <h2 style="margin-bottom: 15px;">Your Mood-Based Playlist Generator</h2>
+                <p style="font-size: 1.2rem; margin-bottom: 20px;">Create playlists tailored to your mood and discover new music!</p>
+                <p style="font-size: 1.1rem; margin-bottom: 20px;">Login with Spotify for more personalized recommendations based on your listening history.</p>
                 <br>
                 <a href="{0}" class="login-button">
                     Login with Spotify
                 </a>
+                <a href="#" class="signup-button">
+                    Signup without Spotify
+                </a>
                 <p style="font-size: 0.9rem; margin-top: 20px; color: #555;">
-                    Your AI music assistant needs Spotify access to make personalized recommendations.
+                    Connect to enhance your music discovery experience
                 </p>
             </div>
             """.format(f"{BACKEND_URL}/login-spotify"), unsafe_allow_html=True)
-            
-            # Features showcase
-            st.markdown("""
-            <div style="margin-top: 30px; background-color: rgba(255, 255, 255, 0.7); border-radius: 15px; padding: 20px;">
-                <h3 style="text-align: center; margin-bottom: 20px;">Features</h3>
-                <div style="display: flex; justify-content: space-between; flex-wrap: wrap; gap: 15px;">
-                    <div style="flex: 1; min-width: 200px; padding: 15px; background-color: rgba(255, 255, 255, 0.8); border-radius: 10px;">
-                        <h4>🎯 Personalized Recommendations</h4>
-                        <p>Get music suggestions based on your listening history</p>
-                    </div>
-                    <div style="flex: 1; min-width: 200px; padding: 15px; background-color: rgba(255, 255, 255, 0.8); border-radius: 10px;">
-                        <h4>📝 Playlist Creation</h4>
-                        <p>Create custom playlists for any mood or occasion</p>
-                    </div>
-                    <div style="flex: 1; min-width: 200px; padding: 15px; background-color: rgba(255, 255, 255, 0.8); border-radius: 10px;">
-                        <h4>🔍 Artist Discovery</h4>
-                        <p>Find new artists similar to your favorites</p>
-                    </div>
-                </div>
-            </div>
-            """, unsafe_allow_html=True)
 
     # Footer
     st.markdown("""
-    <div style="position: fixed; bottom: 0; left: 0; width: 100%; background-color: rgba(255, 255, 255, 0.7); 
-    padding: 10px; text-align: center; font-size: 0.8rem; color: #555;">
-        AI Music Assistant • Powered by Spotify API • © 2025
+    <div style="position: fixed; bottom: 0; left: 0; width: 100%; background-color: rgba(144, 198, 124, 0.7); 
+    padding: 10px; text-align: center; font-size: 0.8rem; color: #328E6E;">
+        Mood-Based Playlist Generator • © 2025
     </div>
     """, unsafe_allow_html=True)
