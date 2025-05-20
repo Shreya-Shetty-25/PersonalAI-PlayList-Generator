@@ -6,10 +6,10 @@ from together import Together
 
 
 # Load your OpenRouter API key from Streamlit secrets
-OPENROUTER_API_KEY = st.secrets["OPENROUTER_API_KEY"]
+# OPENROUTER_API_KEY = st.secrets["OPENROUTER_API_KEY"]
 OPENROUTER_URL = "https://openrouter.ai/api/v1/chat/completions"
 OPENROUTER_MODEL = "deepseek/deepseek-r1-distill-llama-70b:free"
-TOGETHER_API_KEY=st.secrets["TOGETHER_API_KEY"]
+# TOGETHER_API_KEY=st.secrets["TOGETHER_API_KEY"]
 
 MOOD_DETECTION_PROMPT = '''
 You're an emotion detection AI assistant.
