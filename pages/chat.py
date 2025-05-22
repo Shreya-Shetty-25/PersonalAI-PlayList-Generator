@@ -148,10 +148,13 @@ st.markdown("""
     padding: 10px 15px;
     border-radius: 15px;
     max-width: 75%;
+    width: fit-content;
     margin-left: auto;
     margin-right: 0;
     margin-top: 10px;
     text-align: right;
+    font-size: 16px;
+    font-weight: bold;
 }
 .bot-msg {
     background-color: #F1F0F0;
@@ -159,10 +162,13 @@ st.markdown("""
     padding: 10px 15px;
     border-radius: 15px;
     max-width: 75%;
-    margin-right: auto;
-    margin-left: 0;
+    width: fit-content;
+    margin-left: auto;
+    margin-right: 0;
     margin-top: 10px;
-    text-align: left;
+    text-align: right;
+    font-size: 16px;
+    font-weight: bold;
 }
 </style>
 """, unsafe_allow_html=True)
