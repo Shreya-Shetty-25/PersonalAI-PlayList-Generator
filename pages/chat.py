@@ -237,7 +237,7 @@ st.markdown("""
 .chat-avatar {
     width: 40px;
     height: 40px;
-    border-radius: 50%;
+    border-radius: 20%;
     margin: 0 10px;
     flex-shrink: 0;
 }
