@@ -33,10 +33,9 @@ if "spotify_id" in query_params:
     # Render chat UI once user info is available
     if st.session_state.spotify_user_info:
         user_name = st.session_state.spotify_user_info.get('display_name', 'Music Lover')
-        user_initial = user_name[0].upper() if user_name else "M"
         
         # Chat interface container
-        st.Header(f"""{user_initial}, {user_name}""", unsafe_allow_html=True)
+        st.header(f"""Welcome, {user_name}""", unsafe_allow_html=True)
         
         # Display chat messages with custom styling
         for idx, msg in enumerate(st.session_state.messages):
