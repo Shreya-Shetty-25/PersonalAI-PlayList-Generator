@@ -127,7 +127,7 @@ for idx, msg in enumerate(st.session_state.messages):
 
 # Input form at the bottom
 with st.form(key="chat_form", clear_on_submit=True):
-    user_input = st.text_area("Input your message:", height=80)
+    user_input = st.text_area("Input your message:", height=10)
     submitted = st.form_submit_button("Submit")
 
 if submitted and user_input.strip() != "":
@@ -136,13 +136,11 @@ if submitted and user_input.strip() != "":
 
     # Get bot response
     with st.spinner("Thinking..."):
-        full_history = [f"{m['role']}: {m['content']}" for m in st.session_state.messages]
-        bot_response = reply_from_bot(full_history, user_input)
+        bot_response = reply_from_bot(st.session_state.messages, user_input)
 
     # Add bot response
     st.session_state.messages.append({"role": "assistant", "content": bot_response})
     st.experimental_rerun()
-
 # Reset button
 if st.session_state.messages and st.button("🗑️ Reset Chat"):
     st.session_state.messages = []
