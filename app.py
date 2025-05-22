@@ -76,7 +76,7 @@ if "spotify_id" in query_params:
         # Redirect using JavaScript
         components.html(f"""
             <script>
-                window.location.href = "/app2?spotify_id={spotify_id}";
+                window.location.href = "/chat?spotify_id={spotify_id}";
             </script>
         """, height=0)
     else:
