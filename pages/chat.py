@@ -21,7 +21,7 @@ st.subheader("🧠 I'm **Weebsu**, your mood-detecting music buddy!")
 for msg in st.session_state.messages:
     with st.chat_message(msg["role"], avatar="🧑‍🦱" if msg["role"] == "user" else "🤖"):
         if msg["role"] == "user":
-            st.markdown(f"<div style='background-color:#DCF8C6; padding:10px; border-radius:10px; text-align:right;'>{msg["content"]}</div>", unsafe_allow_html=True)
+            st.markdown(f"<div style='background-color: #DCF8C6;color: black; padding:10px 15px; border-radius:10px;max-width: 75%;width: fit-content;margin-left: auto;margin-right: 0;margin-top: 10px;text-align: right;font-size: 20px;'>{msg["content"]}</div>", unsafe_allow_html=True)
         else:
             st.markdown(f"<div style='background-color:#EAEAEA; padding:10px; border-radius:10px; text-align:left;'>{msg["content"]}</div>", unsafe_allow_html=True)
         # st.markdown(msg["content"])
