@@ -64,10 +64,10 @@ if st.session_state.spotify_user_info:
     # st.set_page_config(layout="wide")
     
     # Load image from file
-    img = Image.open("weebsu.png")
-    new_size = (150, 150)
-    img = img.resize(new_size)
-    st.image(img)
+    # img = Image.open("weebsu.png")
+    # new_size = (150, 150)
+    # img = img.resize(new_size)
+    # st.image(img)
     
     history = []
     st.title("Hi I'm Weebsu! How can I help?")
