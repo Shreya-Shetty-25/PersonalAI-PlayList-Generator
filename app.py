@@ -14,6 +14,12 @@ BACKEND_URL = "https://personalai-playlist-generator.onrender.com"
 # Logo and header section
 st.title("""Transform your mood into melody with AI-powered playlist creation""")
 
+if "messages" not in st.session_state:
+    st.session_state.messages = []
+
+if "spotify_user_info" not in st.session_state:
+    st.session_state.spotify_user_info = None
+
 # Check for Spotify login status
 query_params = st.query_params
 if "spotify_id" in query_params:
@@ -33,41 +39,6 @@ if "spotify_id" in query_params:
 
     # Render chat UI once user info is available
     if st.session_state.spotify_user_info:
-        # user_name = st.session_state.spotify_user_info.get('display_name', 'Music Lover')
-        
-        # # Chat interface container
-        # st.header(f"""Welcome, {user_name}""", unsafe_allow_html=True)
-        
-        # # Display chat messages with custom styling
-        # for idx, msg in enumerate(st.session_state.messages):
-        #     role = msg["role"]
-        #     content = msg["content"]
-            
-        #     if role == "user":
-        #         st.text(f"""{content}""", unsafe_allow_html=True)
-        #     else:
-        #         st.text(f"""{content}""", unsafe_allow_html=True)
-        
-        # prompt = st.text_input("", placeholder="What kind of playlist would you like today?", key="chat_input", label_visibility="collapsed")
-        
-        # # Process user input
-        # if prompt:
-        #     st.session_state.messages.append({"role": "user", "content": prompt})
-            
-        #     # Add assistant response (simulate API call)
-        #     with st.spinner(""):
-        #         bot_reply = reply_from_bot(st.session_state.messages, prompt)
-        #         st.session_state.messages.append({"role": "assistant", "content": bot_reply})
-            
-        #     # Rerun to refresh the UI
-        #     st.experimental_rerun()
-            
-        # # Add a clear chat button outside of chat container
-        # col1, col2, col3 = st.columns([4, 1, 4])
-        # with col2:
-        #     if st.session_state.messages and st.button("Reset Chat", key="clear_chat"):
-        #         st.session_state.messages = []
-        #         st.experimental_rerun()
         spotify_id = query_params["spotify_id"]
     
         # Show a loading message
