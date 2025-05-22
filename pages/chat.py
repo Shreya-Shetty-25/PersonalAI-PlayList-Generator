@@ -1,44 +1,69 @@
 import streamlit as st
 from streamlit_chat import message
-from model import reply_from_bot
-from dotenv import load_dotenv
+from model import reply_from_bot  # Your existing backend function
 
-load_dotenv()
+# Example user and bot avatars (replace URLs if you want)
+USER_AVATAR = "https://i.imgur.com/c6zK4GK.png"   # user icon
+BOT_AVATAR = "https://i.imgur.com/2P2rZ5z.png"    # bot icon
 
-BACKEND_URL = "https://personalai-playlist-generator.onrender.com"
+st.set_page_config(page_title="Playlist Chatbot", page_icon="🎵", layout="centered")
 
+# Initialize session state for messages
 if "messages" not in st.session_state:
     st.session_state.messages = []
-if "spotify_user_info" not in st.session_state:
-    st.session_state.spotify_user_info = {}
 
-if st.session_state.spotify_user_info:
-    user_name = st.session_state.spotify_user_info.get('display_name', 'Music Lover')
-    st.header(f"🎵 Welcome, {user_name}")
+st.title("🎵 Playlist Generator Chatbot")
 
-    # Show chat history
-    for idx, msg in enumerate(st.session_state.messages):
-        is_user = msg["role"] == "user"
-        message(msg["content"], is_user=is_user, key=f"msg_{idx}")
+# Chat messages container with fixed height and scroll
+chat_container = st.container()
 
-    # Input prompt
-    prompt = st.text_input(
-        "",
-        placeholder="What kind of playlist would you like today?",
-        key="chat_input",
-        label_visibility="collapsed",
+with chat_container:
+    st.markdown(
+        """
+        <style>
+        .chat-scroll {
+            max-height: 500px;
+            overflow-y: auto;
+            padding-bottom: 10px;
+            border: 1px solid #eee;
+            border-radius: 10px;
+        }
+        </style>
+        """, unsafe_allow_html=True
     )
 
-    if prompt:
-        st.session_state.messages.append({"role": "user", "content": prompt})
-        with st.spinner("Thinking..."):
-            bot_reply = reply_from_bot(st.session_state.messages, prompt)
-            st.session_state.messages.append({"role": "assistant", "content": bot_reply})
-        st.experimental_rerun()
+    # Messages area with scroll
+    messages_html = st.empty()
+    messages_html.markdown(
+        '<div class="chat-scroll" id="chat-scroll"></div>',
+        unsafe_allow_html=True
+    )
 
-    # Reset chat button
-    if st.session_state.messages and st.button("🗑️ Reset Chat"):
-        st.session_state.messages = []
-        st.experimental_rerun()
-else:
-    st.warning("User data not found. Please log in again via the Home page.")
+    # Display messages using streamlit-chat's message()
+    for i, msg in enumerate(st.session_state.messages):
+        is_user = msg["role"] == "user"
+        avatar = USER_AVATAR if is_user else BOT_AVATAR
+        message(msg["content"], is_user=is_user, avatar=avatar, key=str(i))
+
+# Chat input area fixed at bottom with form
+with st.form(key="input_form", clear_on_submit=True):
+    user_input = st.text_input("Type your message here...", key="input")
+    submit_button = st.form_submit_button(label="Send")
+
+if submit_button and user_input:
+    # Append user message
+    st.session_state.messages.append({"role": "user", "content": user_input})
+
+    # Call your bot reply function
+    with st.spinner("Thinking..."):
+        bot_response = reply_from_bot(st.session_state.messages, user_input)
+
+    # Append bot response
+    st.session_state.messages.append({"role": "assistant", "content": bot_response})
+
+    st.experimental_rerun()
+
+# Reset button below chat input
+if st.button("🗑️ Reset Chat"):
+    st.session_state.messages = []
+    st.experimental_rerun()
