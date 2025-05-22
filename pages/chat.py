@@ -42,12 +42,12 @@
 #         st.experimental_rerun()
 # else:
 #     st.warning("User data not found. Please log in again via the Home page.")
-import numpy as np
-import pandas as pd
+# import numpy as np
+# import pandas as pd
 import streamlit as st
-import altair as alt
-import openai
-import hashlib
+# import altair as alt
+# import openai
+# import hashlib
 from PIL import Image
 from model import reply_from_bot
 
