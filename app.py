@@ -4,7 +4,6 @@ from model import reply_from_bot
 from dotenv import load_dotenv
 import streamlit.components.v1 as components
 import random
-from pages import chat
 
 # Load environment variables
 load_dotenv()
@@ -47,8 +46,7 @@ if "spotify_id" in query_params:
         # Show a loading message
         st.success("Login successful! Redirecting to chat...")
 
-        st.session_state.runpage = chat
-        st.session_state.runpage()
+        st.experimental_set_query_params(page="chat")
         st.experimental_rerun()
     else:
         st.error("Failed to fetch user information. Please try logging in again.")
