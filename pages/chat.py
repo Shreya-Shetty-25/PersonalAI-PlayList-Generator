@@ -61,7 +61,7 @@ if st.session_state.spotify_user_info:
     user_name = st.session_state.spotify_user_info.get('display_name', 'Music Lover')
     st.header(f"🎵 Welcome, {user_name}")
 
-    st.set_page_config(layout="wide")
+    # st.set_page_config(layout="wide")
     
     # Load image from file
     img = Image.open("weebsu.png")
