@@ -19,14 +19,14 @@ st.subheader("🧠 I'm **Weebsu**, your mood-detecting music buddy!")
 
 # Display chat history
 for msg in st.session_state.messages:
-    with st.chat_message(msg["role"], avatar="user_avatar.png" if msg["role"] == "user" else "weebsu.png"):
+    with st.chat_message(msg["role"], avatar="🧑‍🦱" if msg["role"] == "user" else "🤖"):
         st.markdown(msg["content"])
 
 # Chat input at bottom
 if prompt := st.chat_input("Type your message here..."):
     # Append user message
     st.session_state.messages.append({"role": "user", "content": prompt})
-    with st.chat_message("user", avatar="user_avatar.png"):
+    with st.chat_message("user", avatar="🧑‍🦱"):
         st.markdown(prompt)
 
     # Generate bot response
@@ -35,5 +35,5 @@ if prompt := st.chat_input("Type your message here..."):
 
     # Append bot message
     st.session_state.messages.append({"role": "assistant", "content": bot_response})
-    with st.chat_message("assistant", avatar="weebsu.png"):
+    with st.chat_message("assistant", avatar="🤖"):
         st.markdown(bot_response)
