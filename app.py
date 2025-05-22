@@ -13,6 +13,7 @@ BACKEND_URL = "https://personalai-playlist-generator.onrender.com"
 
 st.set_page_config(initial_sidebar_state="collapsed")
 
+
 # Logo and header section
 st.title("""Transform your mood into melody with AI-powered playlist creation""")
 
@@ -46,7 +47,8 @@ if "spotify_id" in query_params:
         # Show a loading message
         st.success("Login successful! Redirecting to chat...")
 
-        st.query_params = {"page": ["chat"]}
+        st.switch_page("pages/chat.py")
+
 
     # Rerun to apply changes immediately
         # st.runtime.reload()
