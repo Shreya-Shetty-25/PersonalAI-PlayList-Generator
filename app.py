@@ -46,7 +46,9 @@ if "spotify_id" in query_params:
         # Show a loading message
         st.success("Login successful! Redirecting to chat...")
 
-        st.experimental_set_query_params(page="chat")
+        st.query_params = {"page": ["chat"]}
+
+    # Rerun to apply changes immediately
         st.experimental_rerun()
     else:
         st.error("Failed to fetch user information. Please try logging in again.")
