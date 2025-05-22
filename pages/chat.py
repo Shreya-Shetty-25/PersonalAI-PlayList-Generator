@@ -92,25 +92,23 @@ except FileNotFoundError:
 st.title("Hi I'm Weebsu! How can I help?")
 st.subheader("🧠 Weebsu is a mood detector chatbot")
 
-# Show conversation history in scrollable area
-chat_container = st.container()
-with chat_container:
-    for idx, msg in enumerate(st.session_state.messages):
-        is_user = msg["role"] == "user"
-        message(msg["content"], is_user=is_user, key=f"msg_{idx}")
+# Display current chat messages
+for message_data in st.session_state.messages:
+    with st.chat_message(message_data["role"]):
+        st.markdown(message_data["content"])
 
 # Fixed input at bottom
-user_input = st.chat_input("Type your message here...")
-
-if user_input:
-    # Add user message
+if user_input := st.chat_input("Type your message here..."):
+    # Add user message to chat history
     st.session_state.messages.append({"role": "user", "content": user_input})
-    st.rerun()  # Show user message immediately
+    with st.chat_message("user"):
+        st.markdown(user_input)
     
     # Get bot response
     with st.spinner("Thinking..."):
         bot_response = reply_from_bot(st.session_state.messages, user_input)
-
-    # Add bot reply
+    
+    # Display and store assistant response
+    with st.chat_message("assistant"):
+        st.markdown(bot_response)
     st.session_state.messages.append({"role": "assistant", "content": bot_response})
-    st.rerun()
