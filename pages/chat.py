@@ -1,5 +1,4 @@
 import streamlit as st
-import requests
 from streamlit_chat import message
 from model import reply_from_bot
 from dotenv import load_dotenv
@@ -8,14 +7,10 @@ load_dotenv()
 
 BACKEND_URL = "https://personalai-playlist-generator.onrender.com"
 
-# Initialize session states
 if "messages" not in st.session_state:
     st.session_state.messages = []
 if "spotify_user_info" not in st.session_state:
     st.session_state.spotify_user_info = {}
-
-# Get Spotify ID from query params
-# query_params = st.query_params
 
 if st.session_state.spotify_user_info:
     user_name = st.session_state.spotify_user_info.get('display_name', 'Music Lover')
@@ -27,8 +22,12 @@ if st.session_state.spotify_user_info:
         message(msg["content"], is_user=is_user, key=f"msg_{idx}")
 
     # Input prompt
-    prompt = st.text_input("", placeholder="What kind of playlist would you like today?",
-                           key="chat_input", label_visibility="collapsed")
+    prompt = st.text_input(
+        "",
+        placeholder="What kind of playlist would you like today?",
+        key="chat_input",
+        label_visibility="collapsed",
+    )
 
     if prompt:
         st.session_state.messages.append({"role": "user", "content": prompt})
@@ -37,7 +36,7 @@ if st.session_state.spotify_user_info:
             st.session_state.messages.append({"role": "assistant", "content": bot_reply})
         st.experimental_rerun()
 
-    # Reset chat
+    # Reset chat button
     if st.session_state.messages and st.button("🗑️ Reset Chat"):
         st.session_state.messages = []
         st.experimental_rerun()
