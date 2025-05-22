@@ -71,7 +71,7 @@ st.session_state.messages.append({"role": "user", "content":user_input})
 # On input
 if user_input:
     st.session_state.past.append(user_input)
-
+    message(st.session_state.past[len(st.session_state.past)-1], is_user=True, key=f"user_{len(st.session_state.past)-1}")
     # Spinner during actual bot response logic
     with st.spinner("Bot is thinking..."):
         bot_response = reply_from_bot(st.session_state.messages, user_input)
