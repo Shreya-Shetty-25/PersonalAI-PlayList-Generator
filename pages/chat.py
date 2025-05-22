@@ -155,6 +155,19 @@ st.markdown("""
     text-align: right;
     font-size: 16px;
     font-weight: bold;
+    position: relative;
+}
+
+.user-msg::after {
+    content: '';
+    position: absolute;
+    top: 0;
+    right: -8px;
+    width: 0;
+    height: 0;
+    border-left: 8px solid #DCF8C6;
+    border-top: 8px solid transparent;
+    border-bottom: 8px solid transparent;
 }
 .bot-msg {
     background-color: #F1F0F0;
@@ -163,11 +176,11 @@ st.markdown("""
     border-radius: 15px;
     max-width: 75%;
     width: fit-content;
-    margin-left: auto;
-    margin-right: 0;
+    margin-right: auto;
+    margin-left: 0;
     margin-top: 10px;
-    text-align: right;
-    font-size: 16px;
+    text-align: left;
+    font-size: 18px;
     font-weight: bold;
 }
 </style>
