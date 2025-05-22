@@ -20,14 +20,19 @@ st.subheader("🧠 I'm **Weebsu**, your mood-detecting music buddy!")
 # Display chat history
 for msg in st.session_state.messages:
     with st.chat_message(msg["role"], avatar="🧑‍🦱" if msg["role"] == "user" else "🤖"):
-        st.markdown(msg["content"])
+        if msg["role"] == "user":
+            st.markdown(f"<div style='background-color:#DCF8C6; padding:10px; border-radius:10px; text-align:right;'>{msg["content"]}</div>", unsafe_allow_html=True)
+        else:
+            st.markdown(f"<div style='background-color:#EAEAEA; padding:10px; border-radius:10px; text-align:left;'>{msg["content"]}</div>", unsafe_allow_html=True)
+        # st.markdown(msg["content"])
 
 # Chat input at bottom
 if prompt := st.chat_input("Type your message here..."):
     # Append user message
     st.session_state.messages.append({"role": "user", "content": prompt})
     with st.chat_message("user", avatar="🧑‍🦱"):
-        st.markdown(prompt)
+        # st.markdown(prompt)
+        st.markdown(f"<div style='background-color:#DCF8C6; padding:10px; border-radius:10px; text-align:right;'>{prompt}</div>", unsafe_allow_html=True)
 
     # Generate bot response
     with st.spinner("Thinking..."):
@@ -36,4 +41,5 @@ if prompt := st.chat_input("Type your message here..."):
     # Append bot message
     st.session_state.messages.append({"role": "assistant", "content": bot_response})
     with st.chat_message("assistant", avatar="🤖"):
-        st.markdown(bot_response)
+        # st.markdown(bot_response)
+        st.markdown(f"<div style='background-color:#EAEAEA; padding:10px; border-radius:10px; text-align:left;'>{bot_response}</div>", unsafe_allow_html=True)
