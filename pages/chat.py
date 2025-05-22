@@ -126,22 +126,25 @@ for idx, msg in enumerate(st.session_state.messages):
     message(msg["content"], is_user=is_user, key=f"msg_{idx}")
 
 # Input form at the bottom
-with st.form(key="chat_form", clear_on_submit=True):
-    user_input = st.text_area("Input your message:", height=10)
-    submitted = st.form_submit_button("Submit")
+# Input box at the bottom (single-line)
+with st.container():
+    user_input = st.text_input(
+        "You:", 
+        placeholder="Type your message here...", 
+        key="chat_input", 
+        label_visibility="collapsed"
+    )
+    
+    if user_input.strip():
+        # Add user message
+        st.session_state.messages.append({"role": "user", "content": user_input})
 
-if submitted and user_input.strip() != "":
-    # Add user message
-    st.session_state.messages.append({"role": "user", "content": user_input})
+        # Get bot response
+        with st.spinner("Thinking..."):
+            bot_response = reply_from_bot(st.session_state.messages, user_input)
 
-    # Get bot response
-    with st.spinner("Thinking..."):
-        bot_response = reply_from_bot(st.session_state.messages, user_input)
+        # Add bot reply
+        st.session_state.messages.append({"role": "assistant", "content": bot_response})
 
-    # Add bot response
-    st.session_state.messages.append({"role": "assistant", "content": bot_response})
-    st.experimental_rerun()
-# Reset button
-if st.session_state.messages and st.button("🗑️ Reset Chat"):
-    st.session_state.messages = []
-    st.experimental_rerun()
+        # Clear input and rerun
+        st.experimental_rerun()
