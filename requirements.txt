@@ -8,3 +8,4 @@ fastapi
 ollama
 pydantic
 together
+streamlit_chat
