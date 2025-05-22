@@ -146,5 +146,3 @@ with st.container():
         # Add bot reply
         st.session_state.messages.append({"role": "assistant", "content": bot_response})
 
-        # Clear input and rerun
-        st.experimental_rerun()
