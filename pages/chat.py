@@ -105,7 +105,8 @@ user_input = st.chat_input("Type your message here...")
 if user_input:
     # Add user message
     st.session_state.messages.append({"role": "user", "content": user_input})
-
+    st.rerun()  # Show user message immediately
+    
     # Get bot response
     with st.spinner("Thinking..."):
         bot_response = reply_from_bot(st.session_state.messages, user_input)
