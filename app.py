@@ -11,6 +11,8 @@ load_dotenv()
 # Configuration
 BACKEND_URL = "https://personalai-playlist-generator.onrender.com"
 
+st.set_page_config(initial_sidebar_state="collapsed")
+
 # Logo and header section
 st.title("""Transform your mood into melody with AI-powered playlist creation""")
 
