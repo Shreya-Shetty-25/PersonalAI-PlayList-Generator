@@ -49,7 +49,7 @@ if "spotify_id" in query_params:
         st.query_params = {"page": ["chat"]}
 
     # Rerun to apply changes immediately
-        st.experimental_rerun()
+        st.runtime.reload()
     else:
         st.error("Failed to fetch user information. Please try logging in again.")
         
