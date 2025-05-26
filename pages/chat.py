@@ -46,59 +46,45 @@
 #     st.chat_input("Please wait for the bot to respond...", disabled=True)
 import streamlit as st
 from streamlit_chat import message
-from model import reply_from_bot  # your custom bot logic
+from model import reply_from_bot  # your bot logic
 
-# Set Streamlit page configuration
 st.set_page_config(page_title="Weebsu - Mood Detector Bot", page_icon="🤖", layout="centered")
 
 # Initialize session state
-if "messages" not in st.session_state:
-    st.session_state.messages = []
-
-if "spotify_user_info" not in st.session_state:
-    st.session_state.spotify_user_info = {}
-
-if "past" not in st.session_state:
-    st.session_state.past = []
-
-if "generated" not in st.session_state:
-    st.session_state.generated = []
-
-if "awaiting_bot" not in st.session_state:
-    st.session_state.awaiting_bot = False
+st.session_state.setdefault("messages", [])
+st.session_state.setdefault("past", [])
+st.session_state.setdefault("generated", [])
+st.session_state.setdefault("awaiting_bot", False)
+st.session_state.setdefault("spotify_user_info", {})
 
 # Header
 user_name = st.session_state.spotify_user_info.get('display_name', 'Music Lover')
 st.header(f"🎵 Welcome, {user_name}")
 st.subheader("🧠 I'm **Weebsu**, your mood-detecting music buddy!")
 
-# Display chat history
-# Only show complete human-bot pairs
+# Show only complete past-generated message pairs
 num_pairs = min(len(st.session_state.past), len(st.session_state.generated))
 for i in range(num_pairs):
     message(st.session_state.past[i], is_user=True, key=f"user_{i}")
     message(st.session_state.generated[i], key=f"bot_{i}")
 
+# Chat input (disable if bot is busy)
+user_input = st.chat_input(
+    "Type your message..." if not st.session_state.awaiting_bot else "Please wait for the bot to respond...",
+    disabled=st.session_state.awaiting_bot
+)
 
-# Handle input only if bot is not thinking
-if not st.session_state.awaiting_bot:
-    user_input = st.chat_input("Type your message...", disabled=st.session_state.awaiting_bot)
+# Only proceed if user submitted a message
+if user_input:
+    st.session_state.awaiting_bot = True
+    st.session_state.past.append(user_input)
+    st.session_state.messages.append({"role": "user", "content": user_input})
+    message(user_input, is_user=True, key=f"user_{len(st.session_state.past)-1}")
 
-    if user_input:
-        st.session_state.awaiting_bot = True
-        # st.chat_input("Please wait for the bot to respond...", disabled=True)
-        # Append user input after checking it's valid
-        st.session_state.past.append(user_input)
-        st.session_state.messages.append({"role": "user", "content": user_input})
-        message(user_input, is_user=True, key=f"user_{len(st.session_state.past)-1}")
+    with st.spinner("Bot is thinking..."):
+        bot_response = reply_from_bot(st.session_state.messages, user_input)
 
-        with st.spinner("Bot is thinking..."):
-            bot_response = reply_from_bot(st.session_state.messages, user_input)
-
-        st.session_state.messages.append({"role": "assistant", "content": bot_response})
-        st.session_state.generated.append(bot_response)
-
-        st.session_state.awaiting_bot = False
-        st.rerun()
-else:
-    st.chat_input("Please wait for the bot to respond...", disabled=True)
+    st.session_state.messages.append({"role": "assistant", "content": bot_response})
+    st.session_state.generated.append(bot_response)
+    st.session_state.awaiting_bot = False
+    st.rerun()
