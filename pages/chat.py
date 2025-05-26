@@ -67,7 +67,7 @@ st.subheader("🧠 I'm **Weebsu**, your mood-detecting music buddy!")
 # num_pairs = min(len(st.session_state.past), len(st.session_state.generated))
 for i in range(len(st.session_state.past)):
     message(st.session_state.past[i], is_user=True, key=f"user_{i}")
-    if i<st.session_state.generated:
+    if i<len(st.session_state.generated):
         message(st.session_state.generated[i], key=f"bot_{i}")
 
 # Show chat input only when bot is not responding
