@@ -64,10 +64,11 @@ st.subheader("🧠 I'm **Weebsu**, your mood-detecting music buddy!")
 
 # Show only complete past-generated message pairs
 # Show only complete past-generated message pairs
-num_pairs = min(len(st.session_state.past), len(st.session_state.generated))
-for i in range(num_pairs):
+# num_pairs = min(len(st.session_state.past), len(st.session_state.generated))
+for i in range(len(st.session_state.past)):
     message(st.session_state.past[i], is_user=True, key=f"user_{i}")
-    message(st.session_state.generated[i], key=f"bot_{i}")
+    if i<st.session_state.generated:
+        message(st.session_state.generated[i], key=f"bot_{i}")
 
 # Show chat input only when bot is not responding
 user_input = None
