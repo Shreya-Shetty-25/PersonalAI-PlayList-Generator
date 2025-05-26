@@ -63,18 +63,20 @@ st.header(f"🎵 Welcome, {user_name}")
 st.subheader("🧠 I'm **Weebsu**, your mood-detecting music buddy!")
 
 # Show only complete past-generated message pairs
+# Show only complete past-generated message pairs
 num_pairs = min(len(st.session_state.past), len(st.session_state.generated))
 for i in range(num_pairs):
     message(st.session_state.past[i], is_user=True, key=f"user_{i}")
     message(st.session_state.generated[i], key=f"bot_{i}")
 
-# Chat input (disable if bot is busy)
-user_input = st.chat_input(
-    "Type your message..." if not st.session_state.awaiting_bot else "Please wait for the bot to respond...",
-    disabled=st.session_state.awaiting_bot
-)
+# Show chat input only when bot is not responding
+user_input = None
+if not st.session_state.awaiting_bot:
+    user_input = st.chat_input("Type your message...")
+else:
+    st.caption("🤖 Please wait for the bot to respond...")
 
-# Only proceed if user submitted a message
+# Handle input
 if user_input:
     st.session_state.awaiting_bot = True
     st.session_state.past.append(user_input)
