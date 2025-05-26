@@ -86,7 +86,7 @@ if not st.session_state.awaiting_bot:
 
     if user_input:
         st.session_state.awaiting_bot = True
-
+        st.chat_input("Please wait for the bot to respond...", disabled=True)
         # Append user input after checking it's valid
         st.session_state.past.append(user_input)
         st.session_state.messages.append({"role": "user", "content": user_input})
