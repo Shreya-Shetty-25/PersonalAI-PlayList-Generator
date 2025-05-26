@@ -73,9 +73,12 @@ st.header(f"🎵 Welcome, {user_name}")
 st.subheader("🧠 I'm **Weebsu**, your mood-detecting music buddy!")
 
 # Display chat history
-for i in range(len(st.session_state.past)):
+# Only show complete human-bot pairs
+num_pairs = min(len(st.session_state.past), len(st.session_state.generated))
+for i in range(num_pairs):
     message(st.session_state.past[i], is_user=True, key=f"user_{i}")
     message(st.session_state.generated[i], key=f"bot_{i}")
+
 
 # Handle input only if bot is not thinking
 if not st.session_state.awaiting_bot:
