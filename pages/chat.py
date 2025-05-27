@@ -70,7 +70,7 @@ if "awaiting_bot" not in st.session_state:
     st.session_state.awaiting_bot = False
 
 # Display chat messages
-for i in range(len(st.session_state.past)):
+for i in range(len(st.session_state.generated)):
     message(st.session_state.past[i], is_user=True, key=f"user_{i}")
     message(st.session_state.generated[i], key=f"bot_{i}")
 
