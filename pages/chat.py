@@ -72,7 +72,8 @@ if "awaiting_bot" not in st.session_state:
 # Display chat messages
 for i in range(len(st.session_state.generated)):
     message(st.session_state.past[i], is_user=True, key=f"user_{i}")
-    message(st.session_state.generated[i], key=f"bot_{i}")
+    if i<len(st.session_state.generated):
+        message(st.session_state.generated[i], key=f"bot_{i}")
 
 # Chat input with conditional disabling
 if st.session_state.awaiting_bot:
